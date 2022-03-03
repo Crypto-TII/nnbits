@@ -14,7 +14,5 @@ For example, under the speck32/64 directory, when you run `generateData.py`, it 
 There are `$sizeofdataset` samples in one file, which are all generated from the ourput of round `$round`, and it is the `$samplenumber`th file of this round.
 
 In `genearateData.py`, there is several parameter you can change:
-
-- `number_of_samples` indicates how many samples to genearate, for example, here are total 10**6 samples need to be generated.
-
-- `number_of_rounds` indicates that how many loops to generate the samples, for example, here we use 50 loops to generate samples, so total there would be 50 files for each round, and in each files it contains 10**6/50=20000 samples in one file.
+* `number_of_samples` indicates how many samples to genearate, for example, here are total 10**6 samples need to be generated.
+* `number_of_rounds` indicates that how many loops to generate the samples, for example, here we use 50 loops to generate samples, so total there would be 50 files for each round, and in each files it contains 10**6/50=20000 samples in one file.
