@@ -669,3 +669,20 @@ def generate_avalanche_dataset(num_samples):
           data[j][:, i*64:(i+1)*64]=result[j]^base[j]
       diff=np.roll(diff, -1, axis=0)
   return data
+
+def check_test_vector():
+    key = [0x19, 0x18, 0x11, 0x10, 0x09, 0x08, 0x01, 0x00, 0x19, 0x18, 0x11, 0x10, 0x09, 0x08, 0x01, 0x00]
+    pt = [0x65, 0x74, 0x69, 0x4c, 0x65, 0x74, 0x69, 0x4c]
+    ct = [0x4c, 0xc1, 0xe3, 0x6b, 0x6c, 0xf7, 0x33, 0x29]
+
+    key = np.unpackbits(np.array(key, dtype=np.uint8))
+    pt = np.unpackbits(np.array(pt, dtype=np.uint8))
+    ct = np.unpackbits(np.array(ct, dtype=np.uint8))
+
+    result = evaluate([key.reshape((64, 1)), pt.reshape((32, 1))]) 
+    if ((result[21][0] == ct).all()):
+        print("Test Vector Verified")
+        return True
+    else:
+        print("Test Vector NOT Verified")
+        return False
