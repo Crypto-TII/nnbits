@@ -11,7 +11,7 @@ To use the dataset generator, please run the generateData.py under the correspod
 The dataset would be saved in the numpy format. 
 
 For example, under the speck32/64 directory, when you run `generateData.py`, it will import the speck64/128 code, which is `speck_k128_p64_o64_r27.py`, and output the dataset with filename `data_$sizeofdataset_rounds_$round_samples_$samplenumber.npy`.
-There are `$sizeofdataset` samples in one file, which are all generated from the ourput of round `$round`, and it is the `$samplenumber`th file of this round.
+There are `$sizeofdataset` samples in one file, which are all generated from the ourput of round `$round`, and it is the `$samplenumber`th file of this round. The `$round` is started from 0. 
 
 In `genearateData.py`, there is several parameter you can change:
 * `number_of_samples` indicates how many samples to genearate, for example, here are total 10**6 samples need to be generated.
