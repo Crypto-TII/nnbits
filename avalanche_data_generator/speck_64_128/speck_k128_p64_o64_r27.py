@@ -679,8 +679,8 @@ def check_test_vector():
     pt = np.unpackbits(np.array(pt, dtype=np.uint8))
     ct = np.unpackbits(np.array(ct, dtype=np.uint8))
 
-    result = evaluate([key.reshape((64, 1)), pt.reshape((32, 1))]) 
-    if ((result[21][0] == ct).all()):
+    result = evaluate([key.reshape((128, 1)), pt.reshape((64, 1))])
+    if ((result[26][0] == ct).all()):
         print("Test Vector Verified")
         return True
     else:
