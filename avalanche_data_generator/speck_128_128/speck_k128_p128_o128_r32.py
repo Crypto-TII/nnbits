@@ -726,19 +726,19 @@ def evaluate(input):
   intermediateOutputs.append(cipher_output_31_12.transpose())
   return intermediateOutputs
 def generate_avalanche_dataset(num_samples):
-  key = np.random.randint(2, size=(128, num_samples), dtype=np.uint8)
-  pt = np.random.randint(2, size=(128, num_samples), dtype=np.uint8)
-  diff=np.zeros((128, 1), dtype=np.uint8)
-  diff[-1]=1
-  data=[np.zeros((num_samples, 16384), dtype=np.uint8) for i in range(32)]
-  base=evaluate([key, pt])
-  for i in range(128):
-      input=[key, pt^diff]
-      result=evaluate(input)
-      for j in range(32):
-          data[j][:, i*128:(i+1)*128]=result[j]^base[j]
-      diff=np.roll(diff, -1, axis=0)
-  return data
+    key = np.zeros((128, num_samples), dtype=np.uint8)
+    pt = np.random.randint(2, size=(128, num_samples), dtype=np.uint8)
+    diff=np.zeros((128, 1), dtype=np.uint8)
+    diff[-1]=1
+    data=[np.zeros((num_samples, 16384), dtype=np.uint8) for i in range(32)]
+    base=evaluate([key, pt])
+    for i in range(128):
+        input=[key, pt^diff]
+        result=evaluate(input)
+        for j in range(32):
+            data[j][:, i*128:(i+1)*128]=result[j]^base[j]
+        diff=np.roll(diff, -1, axis=0)
+    return data
 
 def check_test_vector():
     key = [0x19, 0x18, 0x11, 0x10, 0x09, 0x08, 0x01, 0x00, 0x19, 0x18, 0x11, 0x10, 0x09, 0x08, 0x01, 0x00]

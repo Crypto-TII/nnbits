@@ -655,20 +655,21 @@ def evaluate(input):
   cipher_output_26_12 = CONCAT([select_word(xor_26_8,  [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31]),select_word(xor_26_10,  [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31]) ])
   intermediateOutputs.append(cipher_output_26_12.transpose())
   return intermediateOutputs
+
 def generate_avalanche_dataset(num_samples):
-  key = np.random.randint(2, size=(128, num_samples), dtype=np.uint8)
-  pt = np.random.randint(2, size=(64, num_samples), dtype=np.uint8)
-  diff=np.zeros((64, 1), dtype=np.uint8)
-  diff[-1]=1
-  data=[np.zeros((num_samples, 4096), dtype=np.uint8) for i in range(27)]
-  base=evaluate([key, pt])
-  for i in range(64):
-      input=[key, pt^diff]
-      result=evaluate(input)
-      for j in range(27):
-          data[j][:, i*64:(i+1)*64]=result[j]^base[j]
-      diff=np.roll(diff, -1, axis=0)
-  return data
+    key = np.zeros((128, num_samples), dtype=np.uint8)
+    pt = np.random.randint(2, size=(64, num_samples), dtype=np.uint8)
+    diff=np.zeros((64, 1), dtype=np.uint8)
+    diff[-1]=1
+    data=[np.zeros((num_samples, 4096), dtype=np.uint8) for i in range(27)]
+    base=evaluate([key, pt])
+    for i in range(64):
+        input=[key, pt^diff]
+        result=evaluate(input)
+        for j in range(27):
+            data[j][:, i*64:(i+1)*64]=result[j]^base[j]
+        diff=np.roll(diff, -1, axis=0)
+    return data
 
 def check_test_vector():
     key = [0x19, 0x18, 0x11, 0x10, 0x09, 0x08, 0x01, 0x00, 0x19, 0x18, 0x11, 0x10, 0x09, 0x08, 0x01, 0x00]
