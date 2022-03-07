@@ -9,7 +9,7 @@ import numpy as np
 import time
 from datetime import timedelta
 
-loops = 50
+loops = 100
 for i in range(50):
     t = time.time()
     dataset=data_generator.generate_avalanche_dataset(int(number_of_samples/50))
