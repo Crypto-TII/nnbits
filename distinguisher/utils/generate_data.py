@@ -154,7 +154,7 @@ def make_train_data(n, nr):
         delta32[j] = (np.uint32(deltaL)<<16)^deltaR
 
     X=convert_to_binary(delta32)
-    np.save(datapath+"data_"+str(nr)+"rounds_"+str(n)+"_samples.npy",X)
+    np.save(datapath+"data_"+str(nr)+"rounds_"+str(n)+"_samples_b.npy",X)
     #np.save("/home/anna/NBEATSD4/data_"+str(nr)+"rounds_"+str(n)+"_samples.npy",X)
     return(X);
 
@@ -162,5 +162,7 @@ if __name__ == 'main':
 
     datapath = '/opt/cryptanalysis_servers_shared_folder/NBEATSCipherDistinguisher/D1/'
 
-    for rounds in range(1, 22+1):
+    for rounds in [7]: #range(1, 22+1):
         make_train_data(10**6, rounds)
+
+    print("generated data")

@@ -26,7 +26,13 @@ import glob
 
 
 def create_back_and_forecasts(bit_arrays,
-                              lp_indices: list):
+                              lp_indices: list,
+                              h_from_backcast: str):
+    """
+    :param h_from_backcast:
+        if 'remove' the horizon indices will be removed from the lookback period completely.
+        if 'blackout' the horizon indices will still be present, but will all be set to 0.
+    """
 
     ### From the given lp_indices for the lookback period LP create the indices of the horizon (forecast) H:
     all_indices = np.arange(len(bit_arrays[0]))
@@ -34,8 +40,14 @@ def create_back_and_forecasts(bit_arrays,
     h_indices = all_indices
 
     ##################################################################
+    if h_from_backcast == 'remove':
+        backcasts = bit_arrays[:, lp_indices]
 
-    backcasts = bit_arrays[:, lp_indices]
+    elif h_from_backcast == 'blackout':
+        bit_arrays_copy = bit_arrays.copy()
+        bit_arrays_copy[:, h_indices] = 0
+        backcasts = bit_arrays_copy
+
     forecasts = bit_arrays[:, h_indices]
 
     return backcasts, forecasts
@@ -44,7 +56,8 @@ def create_dataset(data_path,
                    train_ids,
                    val_ids,
                    test_ids,
-                   lp_indices):
+                   lp_indices,
+                   h_from_backcast='remove'):
     """
 
     :param data_path: the path to the *.npy file.
@@ -52,6 +65,7 @@ def create_dataset(data_path,
     :param val_ids:
     :param test_ids:
     :param lp_indices:
+    :param h_from_backcast: ('remove', 'blackout') see function create_back_and_forecasts()
 
     :return: Dictionary with keys 'x_train', 'y_train', 'x_val', 'y_val','x_test', 'y_test'
     """
@@ -62,7 +76,10 @@ def create_dataset(data_path,
     #if data_type == '1':
     bit_arrays = np.load(data_path)
 
-    backcasts, forecasts = create_back_and_forecasts(bit_arrays, lp_indices)
+    if 'npz' in data_path[-3:]:
+        bit_arrays = bit_arrays['dataset']
+
+    backcasts, forecasts = create_back_and_forecasts(bit_arrays, lp_indices, h_from_backcast)
 
     x_train, y_train    = backcasts[train_ids], forecasts[train_ids]
     x_val, y_val        = backcasts[val_ids], forecasts[val_ids]

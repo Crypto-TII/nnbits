@@ -2,6 +2,7 @@ import numpy as np
 from subprocess import run
 from multiprocessing.dummy import Pool
 from . import utils
+from . import training_tracker
 import glob
 
 import os
@@ -9,6 +10,8 @@ import os
 # filter out tf info messages, for more info, see
 #   https://stackoverflow.com/questions/40426502/is-there-a-way-to-suppress-the-messages-tensorflow-prints
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '1'
+
+OBSERVE = True
 
 if __name__ == '__main__':
     # ---------------------------------------------------
@@ -70,23 +73,29 @@ if __name__ == '__main__':
 
         cfg_id, gpu_id = ensemble_args  # unpack arguments
 
-        if args.mode == 'train':
-            print(f'training for cfg file {cfg_id} on gpu {gpu_id} was called...')
+        if (args.mode == 'train'):
+            #print(f'training for cfg file {cfg_id} on gpu {gpu_id} was called...')
             script = 'distinguisher.train_single'
         elif args.mode == 'test':
-            print(f'testing for cfg file {cfg_id} on gpu {gpu_id} was called...')
+            #print(f'testing for cfg file {cfg_id} on gpu {gpu_id} was called...')
             script = 'distinguisher.test_single'
         else:
+            print('UNKNOWN SCRIPT.')
             script = None
 
         output = run(f"python -m {script} {cfg_id} {gpu_id} '{args.save_path}' {args.overwrite}",
                      capture_output=True,
                      shell=True)
 
-        print(output.stdout.decode('ascii'))
-        print(output.stderr.decode('ascii'))
+        #print(output.stdout.decode('ascii'))
+        if len(output.stderr.decode('ascii')): print(output.stderr.decode('ascii'))
 
-
+            # if (args.mode == 'train'):
+            #     run(f"python -m distinguisher.training_tracker '{args.save_path}'",
+            #         capture_output=False,
+            #         shell=True)
+            # else:
+            #     pass
     # ---------------------------------------------------
 
     # Pool for multiprocessing, the 'call_script' is called with different arguments:
@@ -97,8 +106,24 @@ if __name__ == '__main__':
         gpu_id = args.gpus[index_id % len(args.gpus)]
         ensemble_args.append([cfg_id, gpu_id])
 
+    # import tqdm
+    #
+    # pool = Pool(processes=args.processes)
+    # for _ in tqdm.tqdm(pool.map(call_script, ensemble_args), total=len(ensemble_args)):
+    #     pass
+    # pool.close()
+    # pool.join()
+    if args.mode == 'train' and OBSERVE:
+        from watchdog.observers import Observer
+        event_handler = training_tracker.MyEventHandler(args.save_path,F.filename_of_log_ensemble_training())
+        observer = Observer()
+        observer.schedule(event_handler, path=args.save_path + '/hist/', recursive=False)
+        observer.start()
+    # ---------------------------------------------------
     pool = Pool(processes=args.processes)
-    pool.map(call_script, ensemble_args)
+    pool.imap(call_script, ensemble_args)
     pool.close()
     pool.join()
     # ---------------------------------------------------
+    if args.mode == 'train' and OBSERVE:
+        observer.stop()
