@@ -9,7 +9,6 @@ It has been modified to allow for the addition of a convolutional block.
 
 import numpy as np
 import tensorflow as tf
-# noinspection PyUnresolvedReferences
 import tensorflow.experimental.numpy as tnp
 from tensorflow.keras import backend as K
 from tensorflow.keras.layers import Concatenate
