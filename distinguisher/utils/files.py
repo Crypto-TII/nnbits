@@ -33,6 +33,10 @@ class FileManager:
     def filename_of_log_ensemble_training(self):
         return f'{self.save_path}/log_ensemble_training.csv'
 
+    def filename_of_BitwiseStatTest_df(self):
+        """ stores filename """
+        return f'{self.save_path}/BitwiseStatTest_df.pkl'
+
     def filename_of_config(self, index):
         """ stores filename """
         return f'{self.cfg_path}/cfg_{index}.cfg'
