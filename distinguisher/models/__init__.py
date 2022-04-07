@@ -2,51 +2,39 @@ import datetime
 import warnings
 from tensorflow import keras
 import tensorflow as tf
-from . import utils
-from .gohr.train_nets import make_resnet, cyclic_lr
+from .. import utils
+from ..gohr.train_nets import make_resnet, cyclic_lr
 import pandas as pd
 import time
 import pickle
-
-#from nbeats_keras.model import NBeatsNet as NBeatsKeras
-warnings.filterwarnings(action='ignore', message='Setting attributes')
-
 from keras.callbacks import LearningRateScheduler
-
-
-
 import numpy as np
 import tensorflow as tf
-# noinspection PyUnresolvedReferences
 import tensorflow.experimental.numpy as tnp
 from tensorflow.keras import backend as K
 from tensorflow.keras.layers import Concatenate
 from tensorflow.keras.layers import Input, Dense, Lambda, Subtract, Add, Reshape
 from tensorflow.keras.models import Model
 from tensorflow.keras.callbacks import EarlyStopping
-
 from keras.layers import Dense, Conv1D, Input, Reshape, Permute, Add, Flatten, BatchNormalization, Activation
 from keras import backend as K
 from keras.regularizers import l2
-
 from keras import backend
 import keras
-#from keras.metrics import MeanMetricWrapper
-
+from keras.callbacks import Callback
 import os
+from keras.utils import losses_utils
+from keras.utils import metrics_utils
+from keras.metrics import MeanRelativeError
+#from nbeats_keras.model import NBeatsNet as NBeatsKeras
 
-# filter out tf info messages,
-#   for more info, see
-#   https://stackoverflow.com/questions/40426502/is-there-a-way-to-suppress-the-messages-tensorflow-prints
-''' TF_CPP_MIN_LOG_LEVEL
-0 = all messages are logged (default behavior)
-1 = INFO messages are not printed
-2 = INFO and WARNING messages are not printed
-3 = INFO, WARNING, and ERROR messages are not printed
-'''
+warnings.filterwarnings(action='ignore', message='Setting attributes')
+
+# Set filter for tensorflow info and warning messages:
+#   for more info, see https://stackoverflow.com/questions/40426502/is-there-a-way-to-suppress-the-messages-tensorflow-prints
+#   2 = INFO and WARNING messages are not printed
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
-from keras.callbacks import Callback
 
 # class NPLogger(Callback):
 #     """Callback that streams epoch results to a CSV file.
@@ -115,45 +103,24 @@ def bitBybit_accuracy(y_true, y_pred, threshold=0.5, filename=None, y_val_length
         np.savez(filename, X=result.numpy())
     return backend.max(result)
 
-
-from keras.utils import losses_utils
-from keras.utils import metrics_utils
-
-from keras.metrics import MeanRelativeError
-
 class BitbyBit(tf.keras.metrics.MeanMetricWrapper):
     def __init__(self, name='bitbybit_accuracy', dtype=None, threshold=0.5, filename=None, y_val_length=None):
         super(BitbyBit, self).__init__(
                     bitBybit_accuracy, name, dtype=dtype, threshold=threshold, filename=filename, y_val_length=y_val_length)
-        # np.savez(filename, train_toggle=1, X=0.0)
 
-# class ToggleMetrics(Callback):
-#     def __init__(self):
-#         super(ToggleMetrics, self).__init__()
-#         '''On test begin (i.e. when evaluate() is called or
-#          validation data is run during fit()) toggle metric flag '''
-#     def on_test_begin(self, logs):
-#         for metric in self.model.metrics:
-#             if 'BIT' in metric.name.upper():
-#                 metric.set_toggle(True)
-#     def on_test_end(self,  logs):
-#         for metric in self.model.metrics:
-#             if 'BIT' in metric.name.upper():
-#                 metric.set_toggle(False)
-
-def smape_loss(y_true, y_pred):
-    """
-    sMAPE loss as defined in "Appendix A" of
-    http://www.forecastingprinciples.com/files/pdf/Makridakia-The%20M3%20Competition.pdf
-    :return: Loss value
-    """
-    # mask=tf.where(y_true,1.,0.)
-    mask = tf.cast(y_true, tf.bool)
-    mask = tf.cast(mask, tf.float32)
-    sym_sum = tf.abs(y_true) + tf.abs(y_pred)
-    condition = tf.cast(sym_sum, tf.bool)
-    weights = tf.where(condition, 1. / (sym_sum + 1e-8), 0.0)
-    return 200 * tnp.nanmean(tf.abs(y_pred - y_true) * weights * mask)
+# def smape_loss(y_true, y_pred):
+#     """
+#     sMAPE loss as defined in "Appendix A" of
+#     http://www.forecastingprinciples.com/files/pdf/Makridakia-The%20M3%20Competition.pdf
+#     :return: Loss value
+#     """
+#     # mask=tf.where(y_true,1.,0.)
+#     mask = tf.cast(y_true, tf.bool)
+#     mask = tf.cast(mask, tf.float32)
+#     sym_sum = tf.abs(y_true) + tf.abs(y_pred)
+#     condition = tf.cast(sym_sum, tf.bool)
+#     weights = tf.where(condition, 1. / (sym_sum + 1e-8), 0.0)
+#     return 200 * tnp.nanmean(tf.abs(y_pred - y_true) * weights * mask)
 
 
 class NBeatsKerasConv:
