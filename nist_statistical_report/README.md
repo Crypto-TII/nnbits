@@ -5,10 +5,10 @@ This is the report generator of the nist statistical tools for
 * speck128/128
 * aes128/128
 
-First, pleas install the NIST STS library following the webpage instruction:
+First, please install the NIST STS library following the webpage instruction:
 https://csrc.nist.gov/publications/detail/sp/800-22/rev-1a/final
 
-After install the library, there should be an `asset` execution file at the root directory.
+After installing the library, there should be an `asset` execution file at the root directory.
 
 To generate the NIST statistical report with our dataset, please, put the `generate_NIST_statistical_report.py` file under the root directory of the nist statistical libry and execute:
 ```

@@ -91,7 +91,7 @@ for r in rounds:
                             '0' + " " + \
                             "experiments/" + " " + \
                             15 * '1')
-    os.rename('tii/external_dependences/sts-2.1.2/experiments/', statistics_report_folder_round)
+    os.rename('experiments/', statistics_report_folder_round)
     nist_statistics_report_time = time.time() - nist_statistics_report_time
 
     f_out = open(statistics_report_folder+"execution_time.txt", "a")
