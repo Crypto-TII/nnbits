@@ -1,0 +1,208 @@
+------------------------------------------------------------------------------
+RESULTS FOR THE UNIFORMITY OF P-VALUES AND THE PROPORTION OF PASSING SEQUENCES
+------------------------------------------------------------------------------
+   generator is <nist_input.txt>
+------------------------------------------------------------------------------
+ C1  C2  C3  C4  C5  C6  C7  C8  C9 C10  P-VALUE  PROPORTION  STATISTICAL TEST
+------------------------------------------------------------------------------
+ 32  19  27  36  25  41  37  27  24  32  0.129620    296/300     Frequency
+ 24  30  38  25  33  29  36  29  30  26  0.712961    298/300     BlockFrequency
+ 30  33  25  27  22  29  43  35  30  26  0.304126    296/300     CumulativeSums
+ 33  18  28  29  30  30  25  43  31  33  0.209577    294/300     CumulativeSums
+ 34  36  29  23  31  31  32  28  32  24  0.828458    297/300     Runs
+ 30  30  26  29  44  30  33  29  26  23  0.383827    300/300     LongestRun
+ 34  28  24  25  34  28  34  28  30  35  0.845773    297/300     Rank
+ 33  50  20  24  31  28  34  24  23  33  0.008879    292/300     FFT
+ 25  24  27  27  35  31  28  30  32  41  0.554420    298/300     NonOverlappingTemplate
+ 33  28  32  28  26  33  25  30  32  33  0.971699    295/300     NonOverlappingTemplate
+ 29  19  25  46  19  30  28  38  36  30  0.012950    297/300     NonOverlappingTemplate
+ 30  33  27  39  20  28  27  36  30  30  0.507512    297/300     NonOverlappingTemplate
+ 38  34  21  27  40  27  20  25  44  24  0.011791    295/300     NonOverlappingTemplate
+ 38  31  29  31  22  31  35  35  21  27  0.431143    298/300     NonOverlappingTemplate
+ 21  37  39  26  25  27  30  36  28  31  0.345115    295/300     NonOverlappingTemplate
+ 35  21  28  36  33  23  28  36  33  27  0.462245    296/300     NonOverlappingTemplate
+ 32  36  25  28  31  28  30  30  35  25  0.902420    298/300     NonOverlappingTemplate
+ 36  33  30  25  34  25  25  27  27  38  0.609377    296/300     NonOverlappingTemplate
+ 31  36  29  26  28  36  25  35  21  33  0.554420    293/300     NonOverlappingTemplate
+ 29  23  34  28  29  36  34  30  26  31  0.862344    295/300     NonOverlappingTemplate
+ 32  28  31  24  32  26  25  41  30  31  0.630178    300/300     NonOverlappingTemplate
+ 29  27  33  34  21  24  29  32  28  43  0.275709    293/300     NonOverlappingTemplate
+ 25  30  27  42  31  25  34  29  29  28  0.581770    298/300     NonOverlappingTemplate
+ 30  25  35  28  42  29  33  21  27  30  0.355909    297/300     NonOverlappingTemplate
+ 32  25  32  26  33  25  31  40  38  18  0.159613    297/300     NonOverlappingTemplate
+ 35  28  25  28  28  35  29  33  35  24  0.810470    297/300     NonOverlappingTemplate
+ 24  25  30  37  39  32  27  25  35  26  0.437274    297/300     NonOverlappingTemplate
+ 26  31  35  24  38  36  32  27  25  26  0.561227    297/300     NonOverlappingTemplate
+ 30  22  27  45  28  16  38  33  28  33  0.021505    296/300     NonOverlappingTemplate
+ 31  33  41  40  30  19  29  28  28  21  0.098526    297/300     NonOverlappingTemplate
+ 32  35  26  31  27  23  25  46  34  21  0.065502    295/300     NonOverlappingTemplate
+ 32  37  32  38  33  29  22  30  24  23  0.407091    298/300     NonOverlappingTemplate
+ 34  41  36  30  22  33  29  25  24  26  0.289667    295/300     NonOverlappingTemplate
+ 35  26  26  36  23  34  36  30  24  30  0.568055    295/300     NonOverlappingTemplate
+ 32  27  26  34  27  28  27  33  33  33  0.958773    299/300     NonOverlappingTemplate
+ 24  27  33  27  37  34  24  32  30  32  0.766282    298/300     NonOverlappingTemplate
+ 24  39  22  31  27  31  28  37  26  35  0.389567    295/300     NonOverlappingTemplate
+ 25  30  33  30  32  31  34  30  24  31  0.961593    299/300     NonOverlappingTemplate
+ 31  27  33  29  29  36  25  29  25  36  0.851383    299/300     NonOverlappingTemplate
+ 39  29  36  28  41  20  31  23  30  23  0.098526    295/300     NonOverlappingTemplate
+ 27  35  31  27  26  26  37  25  30  36  0.719747    298/300     NonOverlappingTemplate
+ 29  29  41  32  27  31  30  33  25  23  0.602458    300/300     NonOverlappingTemplate
+ 22  35  30  23  38  22  30  37  29  34  0.271167    300/300     NonOverlappingTemplate
+ 29  41  30  38  23  27  27  27  35  23  0.262249    295/300     NonOverlappingTemplate
+ 35  39  32  36  27  16  34  29  24  28  0.137282    297/300     NonOverlappingTemplate
+ 30  28  26  27  34  34  25  35  28  33  0.902420    296/300     NonOverlappingTemplate
+ 26  38  37  31  32  31  29  28  33  15  0.188260    296/300     NonOverlappingTemplate
+ 34  23  38  31  37  32  25  28  29  23  0.462245    300/300     NonOverlappingTemplate
+ 29  25  47  25  28  35  27  31  30  23  0.113151    298/300     NonOverlappingTemplate
+ 27  29  33  34  29  40  25  26  27  30  0.719747    296/300     NonOverlappingTemplate
+ 28  24  29  36  40  26  24  37  25  31  0.339799    296/300     NonOverlappingTemplate
+ 39  36  29  26  22  31  24  27  38  28  0.319084    296/300     NonOverlappingTemplate
+ 27  37  31  28  29  42  25  22  33  26  0.294431    296/300     NonOverlappingTemplate
+ 38  25  31  20  25  31  32  26  30  42  0.178278    294/300     NonOverlappingTemplate
+ 45  27  27  30  32  27  35  28  23  26  0.232760    295/300     NonOverlappingTemplate
+ 32  32  33  24  28  28  28  41  19  35  0.271167    297/300     NonOverlappingTemplate
+ 27  36  29  38  29  24  33  35  26  23  0.514124    297/300     NonOverlappingTemplate
+ 24  30  35  26  31  34  39  25  25  31  0.581770    297/300     NonOverlappingTemplate
+ 25  30  28  34  27  27  30  34  36  29  0.919967    295/300     NonOverlappingTemplate
+ 29  24  33  29  31  24  40  28  28  34  0.644060    298/300     NonOverlappingTemplate
+ 31  38  28  32  31  22  32  29  32  25  0.766282    295/300     NonOverlappingTemplate
+ 32  24  27  30  29  32  26  51  25  24  0.024632    297/300     NonOverlappingTemplate
+ 28  30  31  35  34  36  30  31  17  28  0.481416    300/300     NonOverlappingTemplate
+ 22  33  27  27  28  36  38  40  26  23  0.213309    298/300     NonOverlappingTemplate
+ 33  25  37  32  33  24  25  40  20  31  0.217094    293/300     NonOverlappingTemplate
+ 29  39  28  30  40  30  25  32  32  15  0.096578    297/300     NonOverlappingTemplate
+ 30  32  37  27  26  36  24  23  28  37  0.494392    294/300     NonOverlappingTemplate
+ 19  32  29  25  28  39  31  37  20  40  0.062821    296/300     NonOverlappingTemplate
+ 35  25  35  27  30  32  36  21  31  28  0.637119    297/300     NonOverlappingTemplate
+ 34  25  24  35  41  32  24  27  32  26  0.372502    300/300     NonOverlappingTemplate
+ 38  35  28  30  24  30  28  30  29  28  0.867692    296/300     NonOverlappingTemplate
+ 36  33  28  29  33  30  30  31  31  19  0.733228    297/300     NonOverlappingTemplate
+ 35  31  31  31  35  32  25  26  31  23  0.840081    294/300     NonOverlappingTemplate
+ 27  28  28  37  27  25  35  30  25  38  0.623240    299/300     NonOverlappingTemplate
+ 25  30  31  38  34  33  27  22  32  28  0.685579    296/300     NonOverlappingTemplate
+ 27  38  32  37  22  39  26  28  29  22  0.220931    296/300     NonOverlappingTemplate
+ 32  44  25  29  30  26  26  27  26  35  0.329332    297/300     NonOverlappingTemplate
+ 33  29  26  41  27  33  25  25  33  28  0.574903    297/300     NonOverlappingTemplate
+ 25  18  26  29  36  29  32  34  37  34  0.329332    294/300     NonOverlappingTemplate
+ 35  25  35  28  24  30  39  36  28  20  0.262249    297/300     NonOverlappingTemplate
+ 26  37  23  34  28  36  25  32  28  31  0.657933    296/300     NonOverlappingTemplate
+ 29  36  31  31  26  40  31  29  24  23  0.527442    297/300     NonOverlappingTemplate
+ 25  24  27  27  35  31  28  30  32  41  0.554420    298/300     NonOverlappingTemplate
+ 38  30  27  30  28  32  43  16  33  23  0.051942    297/300     NonOverlappingTemplate
+ 40  39  24  25  25  29  25  31  23  39  0.117661    296/300     NonOverlappingTemplate
+ 29  39  28  31  36  29  27  25  23  33  0.616305    297/300     NonOverlappingTemplate
+ 30  31  42  34  25  20  30  30  31  27  0.361387    296/300     NonOverlappingTemplate
+ 36  33  30  26  28  40  29  26  21  31  0.455937    293/300     NonOverlappingTemplate
+ 30  37  28  26  19  33  33  34  29  31  0.581770    296/300     NonOverlappingTemplate
+ 25  30  27  35  29  33  27  32  33  29  0.961593    296/300     NonOverlappingTemplate
+ 25  35  29  37  20  31  28  29  35  31  0.561227    298/300     NonOverlappingTemplate
+ 32  34  29  25  30  36  21  38  31  24  0.455937    299/300     NonOverlappingTemplate
+ 33  36  26  28  24  34  23  30  28  38  0.554420    295/300     NonOverlappingTemplate
+ 27  38  28  32  32  28  27  26  28  34  0.878107    298/300     NonOverlappingTemplate
+ 29  32  26  31  29  35  23  31  31  33  0.935716    296/300     NonOverlappingTemplate
+ 42  28  25  22  29  35  33  26  31  29  0.378138    297/300     NonOverlappingTemplate
+ 20  32  34  26  35  31  30  34  28  30  0.733228    295/300     NonOverlappingTemplate
+ 24  39  29  28  25  35  34  30  28  28  0.685579    296/300     NonOverlappingTemplate
+ 29  37  35  29  31  38  19  28  30  24  0.345115    295/300     NonOverlappingTemplate
+ 33  30  27  32  33  39  27  23  31  25  0.685579    297/300     NonOverlappingTemplate
+ 35  33  37  21  25  33  33  27  28  28  0.588652    292/300     NonOverlappingTemplate
+ 27  31  32  23  29  31  39  33  24  31  0.699313    300/300     NonOverlappingTemplate
+ 29  30  31  25  31  30  30  30  29  35  0.994250    298/300     NonOverlappingTemplate
+ 27  37  26  37  16  34  29  39  25  30  0.098526    300/300     NonOverlappingTemplate
+ 34  29  27  24  33  25  35  28  35  30  0.834308    298/300     NonOverlappingTemplate
+ 21  26  29  30  39  32  25  32  34  32  0.561227    297/300     NonOverlappingTemplate
+ 23  25  32  27  35  31  29  39  37  22  0.329332    297/300     NonOverlappingTemplate
+ 19  29  34  23  31  29  34  28  36  37  0.366918    299/300     NonOverlappingTemplate
+ 24  31  33  31  30  44  22  28  29  28  0.309056    297/300     NonOverlappingTemplate
+ 30  25  28  29  32  31  33  28  33  31  0.992478    298/300     NonOverlappingTemplate
+ 29  29  36  26  33  31  29  32  32  23  0.906970    297/300     NonOverlappingTemplate
+ 40  27  26  31  29  34  31  39  18  25  0.156665    299/300     NonOverlappingTemplate
+ 27  23  34  36  23  34  31  32  32  28  0.712961    298/300     NonOverlappingTemplate
+ 25  26  29  37  43  31  25  32  24  28  0.275709    296/300     NonOverlappingTemplate
+ 39  29  31  27  32  28  30  33  26  25  0.834308    297/300     NonOverlappingTemplate
+ 33  25  36  20  34  25  27  30  31  39  0.345115    295/300     NonOverlappingTemplate
+ 31  17  32  28  34  38  30  37  26  27  0.271167    299/300     NonOverlappingTemplate
+ 33  39  28  26  25  41  35  25  26  22  0.168733    295/300     NonOverlappingTemplate
+ 24  37  41  28  32  25  28  23  26  36  0.245072    298/300     NonOverlappingTemplate
+ 33  23  29  19  28  35  36  40  25  32  0.188260    296/300     NonOverlappingTemplate
+ 30  30  31  29  30  31  38  31  24  26  0.911413    297/300     NonOverlappingTemplate
+ 22  28  32  32  35  34  35  32  26  24  0.678686    298/300     NonOverlappingTemplate
+ 33  23  30  36  35  26  27  30  32  28  0.828458    298/300     NonOverlappingTemplate
+ 40  36  20  34  33  31  28  33  27  18  0.113151    297/300     NonOverlappingTemplate
+ 28  31  36  39  20  25  26  29  38  28  0.271167    299/300     NonOverlappingTemplate
+ 21  33  32  27  34  29  28  33  35  28  0.798139    296/300     NonOverlappingTemplate
+ 36  29  29  25  36  31  23  29  23  39  0.407091    296/300     NonOverlappingTemplate
+ 34  24  24  36  35  23  34  28  32  30  0.595549    296/300     NonOverlappingTemplate
+ 23  24  23  29  32  35  42  26  36  30  0.213309    298/300     NonOverlappingTemplate
+ 34  31  29  26  21  32  31  37  21  38  0.314042    297/300     NonOverlappingTemplate
+ 23  25  24  25  31  32  34  39  38  29  0.345115    297/300     NonOverlappingTemplate
+ 41  23  28  36  24  39  28  26  24  31  0.171867    295/300     NonOverlappingTemplate
+ 34  22  36  36  25  33  30  30  30  24  0.595549    298/300     NonOverlappingTemplate
+ 30  37  26  27  30  29  31  32  34  24  0.883171    298/300     NonOverlappingTemplate
+ 28  22  31  37  42  28  21  22  24  45  0.007694    300/300     NonOverlappingTemplate
+ 36  29  31  23  31  35  31  25  31  28  0.851383    298/300     NonOverlappingTemplate
+ 29  30  34  33  26  25  34  27  38  24  0.699313    299/300     NonOverlappingTemplate
+ 36  29  27  30  31  25  26  32  28  36  0.883171    297/300     NonOverlappingTemplate
+ 35  39  28  21  32  22  28  32  35  28  0.361387    298/300     NonOverlappingTemplate
+ 39  31  29  31  27  24  26  32  30  31  0.834308    298/300     NonOverlappingTemplate
+ 30  29  36  32  26  24  34  19  38  32  0.355909    296/300     NonOverlappingTemplate
+ 29  36  24  25  24  44  28  22  33  35  0.108791    297/300     NonOverlappingTemplate
+ 29  30  27  33  29  24  35  38  34  21  0.527442    299/300     NonOverlappingTemplate
+ 33  30  28  28  31  24  40  33  27  26  0.712961    295/300     NonOverlappingTemplate
+ 23  33  19  33  39  28  30  26  39  30  0.195163    299/300     NonOverlappingTemplate
+ 31  26  30  25  30  29  35  31  22  41  0.487885    295/300     NonOverlappingTemplate
+ 29  28  25  27  23  24  35  43  33  33  0.262249    295/300     NonOverlappingTemplate
+ 32  27  36  29  31  20  24  32  35  34  0.561227    298/300     NonOverlappingTemplate
+ 31  34  26  27  26  28  30  34  46  18  0.068287    298/300     NonOverlappingTemplate
+ 27  34  40  20  26  34  28  20  30  41  0.065502    298/300     NonOverlappingTemplate
+ 37  26  36  32  28  24  28  31  27  31  0.804337    295/300     NonOverlappingTemplate
+ 35  34  18  28  34  26  31  39  27  28  0.309056    294/300     NonOverlappingTemplate
+ 30  36  24  31  29  30  27  31  31  31  0.969347    298/300     NonOverlappingTemplate
+ 17  37  43  38  25  30  31  29  27  23  0.036752    299/300     NonOverlappingTemplate
+ 40  24  35  31  30  31  30  32  26  21  0.455937    298/300     NonOverlappingTemplate
+ 29  37  30  31  26  40  30  30  24  23  0.494392    297/300     NonOverlappingTemplate
+ 18  37  31  30  27  28  31  32  29  37  0.462245    297/300     OverlappingTemplate
+ 40  28  21  32  33  25  29  34  25  33  0.425059    294/300     Universal
+ 34  27  31  34  23  38  37  30  21  25  0.324180    298/300     ApproximateEntropy
+ 18  16  21  30  17  13  19  12  21  16  0.165136    179/183     RandomExcursions
+ 16  14  15  24  22  18  16  26  16  16  0.463301    181/183     RandomExcursions
+ 19  13  24  19  17  19  15  18  18  21  0.866807    179/183     RandomExcursions
+ 17  19  14  22  20  19  18  22  15  17  0.935097    182/183     RandomExcursions
+ 25  12  30  18  20  18  13   9  21  17  0.022082    182/183     RandomExcursions
+ 19  15  19  20  23  21  16  16  18  16  0.946865    182/183     RandomExcursions
+ 25  20  15  13  15  16  14  18  20  27  0.264458    180/183     RandomExcursions
+ 18  17  20  18  24  16  20  19  16  15  0.941144    180/183     RandomExcursions
+ 20  20  25  12  15  17  15  17  23  19  0.562364    180/183     RandomExcursionsVariant
+ 22  16  20  17  22  17  13  18  17  21  0.892197    180/183     RandomExcursionsVariant
+ 24  21  17   9  22  12  28  21  14  15  0.042963    179/183     RandomExcursionsVariant
+ 29  16  17  17  14  22  15  13  21  19  0.257148    179/183     RandomExcursionsVariant
+ 29  19  15  16  19  12  14  22  14  23  0.136847    178/183     RandomExcursionsVariant
+ 26  18  17  16  13  22  14  19  21  17  0.573761    180/183     RandomExcursionsVariant
+ 23  19  12  17  24  11  20  24  14  19  0.249991    179/183     RandomExcursionsVariant
+ 23  14  18  17  12  29  20  16  14  20  0.181007    181/183     RandomExcursionsVariant
+ 19  16  12  27  14  14  22  20  18  21  0.337162    183/183     RandomExcursionsVariant
+ 24   9  14  17  15  17  14  25  26  22  0.065730    181/183     RandomExcursionsVariant
+ 20  17  10  21  12  19  21  19  25  19  0.373437    181/183     RandomExcursionsVariant
+ 18  13  17  18  15  27  11  25  21  18  0.192263    181/183     RandomExcursionsVariant
+ 19  16  16  21  14  24  15  14  25  19  0.528557    182/183     RandomExcursionsVariant
+ 17  21  14  21  21  13  19  21  18  18  0.884006    181/183     RandomExcursionsVariant
+ 19  19  11  24  16  14  21  13  24  22  0.295231    181/183     RandomExcursionsVariant
+ 14  24  18  16  10  18  14  17  27  25  0.095617    182/183     RandomExcursionsVariant
+ 18  17  17  21  25  11  12  21  16  25  0.242986    182/183     RandomExcursionsVariant
+ 16  14  18  22  21  17  20  18  18  19  0.970538    182/183     RandomExcursionsVariant
+ 23  31  26  32  32  31  37  25  37  26  0.623240    298/300     Serial
+ 32  26  27  27  24  31  34  36  27  36  0.766282    295/300     Serial
+ 29  32  24  27  35  27  27  36  27  36  0.759756    296/300     LinearComplexity
+
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+The minimum pass rate for each statistical test with the exception of the
+random excursion (variant) test is approximately = 291 for a
+sample size = 300 binary sequences.
+
+The minimum pass rate for the random excursion (variant) test
+is approximately = 177 for a sample size = 183 binary sequences.
+
+For further guidelines construct a probability table using the MAPLE program
+provided in the addendum section of the documentation.
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
