@@ -46,6 +46,8 @@ class Network(object):
             self.model = create_gohr_generalized_model(self.N_INPUT_BITS, self.N_OUTPUT_BITS, self.model_strength)
         elif self.model_id == 'mlp':
             self.model = create_mlp_model(self.N_INPUT_BITS, self.N_OUTPUT_BITS, self.model_strength)
+        elif self.model_id == 'gohr_experimental':
+            self.model = create_gohr_experimental_model(self.N_INPUT_BITS, self.N_OUTPUT_BITS, self.model_strength)
 
     def reset_weights(self):
         # from https://gist.github.com/jkleint/eb6dc49c861a1c21b612b568dd188668
@@ -116,9 +118,9 @@ class Network(object):
 
     def train(self):
         history = self.model.fit(self.ds_train, epochs=self.epochs,
-                                 verbose=False,
+                                 verbose=True, # TODO: change to verbose=False
+                                 validation_data=self.ds_test, # TODO: comment out
                                  callbacks=self.model.callbacks)
-        # validation_data=self.ds_test)
         self.df_history = pd.DataFrame(history.history)
         return history.history
 

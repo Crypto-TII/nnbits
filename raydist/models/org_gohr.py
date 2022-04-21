@@ -17,7 +17,8 @@ def create_gohrs_model(input_neurons=32, output_neurons=10, model_strength=1, se
 
     model = make_resnet(depth=model_strength, reg_param=10 ** -5);
     model.compile(optimizer='adam', loss='mse',
-                  run_eagerly=False
+                  run_eagerly=False,
+                  metrics='acc' # TODO: comment out this line
                   # added by authors to Gohr's script for fairness, as run_eagerly=True will slow down the run
                   );
 

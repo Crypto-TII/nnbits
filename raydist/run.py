@@ -86,12 +86,12 @@ if __name__ == '__main__':
         a.create_model.remote()  # TODO: maybe this can be replaced by reset weights
         # a.reset_weights.remote()
         a.pass_filters.remote(filter_id)
+        a.pass_filters_test.remote(filter_id)
         a.train.remote()
         a.save_history.remote(F.filename_history(network_id))
         # a.save_weights.remote(F.filename_h5(network_id)) # TODO: maybe uncomment
 
         # --- testing
-        a.pass_filters_test.remote(filter_id)
         ray.get(a.test.remote(F.filename_accs(network_id)))
         return f'finalized id {network_id}'
 

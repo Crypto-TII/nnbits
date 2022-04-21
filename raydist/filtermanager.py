@@ -67,7 +67,10 @@ class FilterManager(object):
         n_random_choice = n_output_bits - 1
 
         for i in np.arange(n_filters):
-            random_choice = np.random.choice(all_bit_ids, size=n_random_choice, replace=False)
+            if n_random_choice > 0:
+                random_choice = np.random.choice(all_bit_ids, size=n_random_choice, replace=False)
+            else:
+                random_choice = []
             input_filter = np.delete(all_bit_ids, list(random_choice) + [list_of_target_bits[i]])
             input_filters[i] = np.sort(input_filter)
             output_filters[i] = np.delete(all_bit_ids, input_filters[i])
