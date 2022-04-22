@@ -19,26 +19,25 @@ def create_gohr_experimental_model(input_neurons=32, output_neurons=10, model_st
     img_sqrt = int(np.sqrt(input_neurons))
 
     # num_blocks=2
-    num_filters = 32 * 4
-    d1 = 64
-    d2 = 64
+    num_filters = 32 * 4 * model_strength
+    d1 = 64 * model_strength
+    d2 = 64 * model_strength
     # word_size=16
     ks = 3
     depth = model_strength
     reg_param = 10 ** -5
     final_activation = 'sigmoid'
 
-    optimizer = tf.keras.optimizers.Adam(learning_rate=0.002, amsgrad=True)  # 'Adam' 0.002
-    loss = 'mse' # 'mse'  # 'Huber'
+    optimizer = tf.keras.optimizers.Adam(learning_rate=0.002, amsgrad=True)  # 'Adam'
+    loss = 'mse'  # 'Huber'
 
     # loss = 'mse'
 
     # put input in square shape instead of word-like structure
     inp = Input(shape=(input_neurons,));
-    rs = Reshape((4, 16))(inp);
-    #rs = Reshape((img_sqrt, img_sqrt))(inp)  # changed rs = Reshape((img_sqrt, img_sqrt, 1))(inp)
-    rs0 = rs
-    #rs = Permute((2, 1))(rs)
+    # rs = Reshape((2 * num_blocks, word_size))(inp);
+    rs = Reshape((img_sqrt, img_sqrt))(inp)  # changed rs = Reshape((img_sqrt, img_sqrt, 1))(inp)
+    rs = Permute((2, 1))(rs)
     # ---- search correlations in one direction
     conv0 = Conv1D(num_filters, kernel_size=1, padding='same', kernel_regularizer=l2(reg_param))(rs);  # changed
     conv0 = BatchNormalization()(conv0);
@@ -54,8 +53,8 @@ def create_gohr_experimental_model(input_neurons=32, output_neurons=10, model_st
         conv2 = Activation('relu')(conv2);
         shortcut = Add()([shortcut, conv2]);
 
-    # #---- search correlations in the other direction
-    #     perm = rs0;
+    # ---- search correlations in the other direction
+    #     perm = Permute((2,1))(rs);
     #     conv0 = Conv1D(num_filters, kernel_size=1, padding='same', kernel_regularizer=l2(reg_param))(perm); # changed
     #     conv0 = BatchNormalization()(conv0);
     #     conv0 = Activation('relu')(conv0);
@@ -68,9 +67,8 @@ def create_gohr_experimental_model(input_neurons=32, output_neurons=10, model_st
     #         conv2 = BatchNormalization()(conv2);
     #         conv2 = Activation('relu')(conv2);
     #         shortcut1 = Add()([shortcut1, conv2]);
-    #     #shortcut1 = Reshape(tf.shape(shortcut))(shortcut1)
-    #
-    # #---- bring them together
+
+    # ---- bring them together
     # shortcut = Concatenate()([shortcut, shortcut1])#Add()([shortcut, shortcut1])
     # add prediction head
     flat1 = Flatten()(shortcut);
@@ -86,7 +84,8 @@ def create_gohr_experimental_model(input_neurons=32, output_neurons=10, model_st
 
     model.compile(loss=loss,
                   optimizer=optimizer,
-                  run_eagerly=False, metrics=['acc'])
+                  run_eagerly=False,
+                  metrics=['acc'])
 
     #     from gohr import cyclic_lr
     #     from keras.callbacks import LearningRateScheduler
