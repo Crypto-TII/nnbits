@@ -145,15 +145,15 @@ def configure_argparse(parser):
                         type=str,
                         help="'0' for single files in the data_path, '1' for a single npy file")
     parser.add_argument('--batch_size',
-                        default=1024,
+                        default=4096,
                         type=int,
                         help='batch size for training, validation and testing.')
     parser.add_argument('--batch_size_val',
-                        default=-1,
+                        default=102400,
                         type=int,
-                        help='batch size for validation (if it should be different from the one used for training).')
+                        help='batch size for validation (it should be different from the one used for training [see TODO]).')
     parser.add_argument('--n_train_batches',
-                        default=8,
+                        default=20,
                         type=int,
                         help='How many batches to use as training data.')
     parser.add_argument('--n_val_batches',
@@ -161,7 +161,7 @@ def configure_argparse(parser):
                         type=int,
                         help='How many batches to use as validation data.')
     parser.add_argument('--n_test_batches',
-                        default=8,
+                        default=1,
                         type=int,
                         help='How many batches to use as test data.')
     parser.add_argument('--n_ensemble',

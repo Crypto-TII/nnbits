@@ -40,6 +40,7 @@ def create_back_and_forecasts(bit_arrays,
     h_indices = all_indices
 
     ##################################################################
+    # TODO change the following numpy slices to take
     if h_from_backcast == 'remove':
         backcasts = bit_arrays[:, lp_indices]
 

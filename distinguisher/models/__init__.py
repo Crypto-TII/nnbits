@@ -346,6 +346,19 @@ class ModelSelector:
             from sklearn.linear_model import RidgeClassifierCV
             self.model = RidgeClassifierCV()
 
+        if 'sklearn' not in model_id:
+            self.initial_weights = self.model.get_weights()
+
+    def set_filename_npzlog(self, filename):
+        self.filename_npzlog = filename
+
+    def reset_weights(self):
+        # from https://gist.github.com/jkleint/eb6dc49c861a1c21b612b568dd188668
+        # alternative to complete re-initialization: shuffle the original weights
+        weights = [np.random.permutation(w.flat).reshape(w.shape) for w in self.initial_weights]
+        # Faster, but less random: only permutes along the first dimension
+        # weights = [np.random.permutation(w) for w in weights]
+        self.model.set_weights(weights)
 
     def passdataset(self,
                     epochs,
