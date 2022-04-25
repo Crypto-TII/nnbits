@@ -19,9 +19,9 @@ def create_gohr_generalized_model(input_neurons=32, output_neurons=10, model_str
     img_sqrt = int(np.sqrt(input_neurons))
 
     # num_blocks=2
-    num_filters = 32 * 4 * model_strength
-    d1 = 64 * model_strength
-    d2 = 64 * model_strength
+    num_filters = 32 * 4 #* model_strength
+    d1 = 64 #* model_strength
+    d2 = 64 #* model_strength
     # word_size=16
     ks = 3
     depth = model_strength

@@ -11,9 +11,12 @@ class Network(object):
                  output_filters,
                  model_id,
                  model_strength,
+                 model_inputs,
+                 model_outputs,
                  set_memory_growth=True,
                  data_strategy='remove',
-                 epochs=10):
+                 epochs=10,
+                 batchsize=4096):
 
         self.data_train = data_train
         self.data_val = data_val
@@ -22,8 +25,11 @@ class Network(object):
 
         self.model_id = model_id
         self.model_strength = model_strength
+        self.model_inputs = model_inputs
+        self.model_outputs = model_outputs
         self.data_strategy = data_strategy
         self.epochs = epochs
+        self.batchsize = batchsize
 
         # inferred class constants
         if data_strategy in ['remove', 'zero_gohr']:
@@ -39,17 +45,7 @@ class Network(object):
     def create_model(self):
         # --- model preparation
         constructor = getattr(models, self.model_id)
-        self.model = constructor(self.N_INPUT_BITS, self.N_OUTPUT_BITS, self.model_strength)
-        # if self.model_id == 'nbeats':
-        #     self.model = create_nbeats_model(self.N_INPUT_BITS, self.N_OUTPUT_BITS, self.model_strength)
-        # elif self.model_id == 'gohr':
-        #     self.model = create_gohrs_model(self.N_INPUT_BITS, self.N_OUTPUT_BITS, self.model_strength)
-        # elif self.model_id == 'gohr_generalized':
-        #     self.model = create_gohr_generalized_model(self.N_INPUT_BITS, self.N_OUTPUT_BITS, self.model_strength)
-        # elif self.model_id == 'mlp':
-        #     self.model = create_mlp_model(self.N_INPUT_BITS, self.N_OUTPUT_BITS, self.model_strength)
-        # elif self.model_id == 'gohr_experimental':
-        #     self.model = create_gohr_experimental_model(self.N_INPUT_BITS, self.N_OUTPUT_BITS, self.model_strength)
+        self.model = constructor(self.model_inputs, self.model_outputs, self.model_strength)
 
     def reset_weights(self):
         # from https://gist.github.com/jkleint/eb6dc49c861a1c21b612b568dd188668
@@ -84,7 +80,7 @@ class Network(object):
 
         ds_train = ds_train.cache()
         ds_train = ds_train.shuffle(N_TRAIN)
-        ds_train = ds_train.batch(4096)
+        ds_train = ds_train.batch(self.batchsize)
         ds_train = ds_train.prefetch(tf.data.AUTOTUNE)
 
         self.ds_train = ds_train

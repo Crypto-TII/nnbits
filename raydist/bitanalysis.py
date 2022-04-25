@@ -4,35 +4,25 @@ import numpy as np
 
 from .filemanager import FileManager
 
-def get_X(F, max_run_id=None):
+def get_X(F):
     config = toml.load(F.filename_cfg())
-    N_FILTERS_LIST = config['N_FILTERS']
-    N_BITS = config['N_BITS']
 
-    if max_run_id is None:
-        max_run_id = len(N_FILTERS_LIST)
-
-    sum_N_FILTERS = np.sum(N_FILTERS_LIST)
-
-    X = np.empty((sum_N_FILTERS, N_BITS))
+    X = np.empty((config['N_FILTERS'], config['N_BITS']))
     X[:] = np.NaN
 
     network_id = 0
 
-    for run_id in np.arange(max_run_id):
+    filename = F.filename_filters()
+    _filters = np.load(filename)
+    input_filters, output_filters = _filters['input_filters'], _filters['output_filters']
 
-        filename = F.filename_filters(run=run_id)
+    for filter_id in np.arange(config['N_FILTERS']):
+        filename = F.filename_accs(network_id)
         if os.path.isfile(filename):
-            _filters = np.load(filename)
-            input_filters, output_filters = _filters['input_filters'], _filters['output_filters']
+            x = np.load(filename)
+            X[network_id][output_filters[filter_id]] = x
 
-            for filter_id in np.arange(N_FILTERS_LIST[run_id]):
-                filename = F.filename_accs(network_id)
-                if os.path.isfile(filename):
-                    x = np.load(filename)
-                    X[network_id][output_filters[filter_id]] = x
-
-                network_id += 1
+        network_id += 1
 
     return X
 
