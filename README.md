@@ -17,6 +17,10 @@ NBEATS-Cipher-Distinguisher
     |_  utils                   <- contains files for dataset creation, file management, plot style, setting random seeds
 ```
 
+A demo is available in Google Colab
+
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github//Crypto-TII/nbeats_statistical_test/demo.ipynb)
+
 # Introduction 
 
 The state-of-the-art (SOTA)
