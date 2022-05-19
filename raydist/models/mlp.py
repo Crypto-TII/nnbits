@@ -1,4 +1,11 @@
 def create_mlp_model(input_neurons=64, output_neurons=1, model_strength=1, set_memory_growth=True):
+    """
+    In [1] the best MLP model for Speck32 is found in the second row of table 3.
+    The MLP has 6 layers with neurons=(128, 256, 112, 256, 128, 64).
+
+    [1] Baksi, A., Breier, J., Dasu, V. A., & Hou, X. (2014). Machine Learning Attacks on Speck. 4–9.
+    https://www.esat.kuleuven.be/cosic/events/silc2020/wp-content/uploads/sites/4/2021/09/Submission10.pdf
+    """
     # --- prepare GPU
     import tensorflow as tf
     gpus = tf.config.experimental.list_physical_devices("GPU")
@@ -11,21 +18,24 @@ def create_mlp_model(input_neurons=64, output_neurons=1, model_strength=1, set_m
 
     inp = Input(shape=(input_neurons,))
     x = inp
-    for i in range(12):
-        x = Dense(64, activation="relu")(x)
+
+    for i in range(model_strength):
+        for neurons in [128, 256, 112, 256, 128, 64]:
+            x = Dense(neurons, activation="relu")(x)
+
     out = Dense(output_neurons, activation="sigmoid")(x)
 
     model = Model(inputs=inp, outputs=out)
 
-    model.compile(optimizer='adam', loss='mse',
-                  run_eagerly=False
-                  # added by authors to Gohr's script for fairness, as run_eagerly=True will slow down the run
-                  );
+    optimizer = tf.keras.optimizers.Adam(amsgrad=True)
+    loss = 'mse'
 
-    from gohr.gohr import cyclic_lr
-    from keras.callbacks import LearningRateScheduler
-    lr = LearningRateScheduler(cyclic_lr(10, 0.002, 0.0001));
+    model.compile(optimizer=optimizer,
+                  loss=loss,
+                  run_eagerly=False,
+                  metrics = ['acc']
+                  )
 
-    model.callbacks = [lr]
+    model.callbacks = []
 
     return model

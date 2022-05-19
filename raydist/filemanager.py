@@ -9,7 +9,7 @@ class FileManager:
         self.savepath = savepath
 
         # create sub-directories if not available:
-        make_paths = ['h5', 'hist', 'filters', 'test_accuracies']
+        make_paths = ['h5', 'hist', 'filters', 'test_accuracies', 'test_accuracies_bit_by_bit']
 
         for path in make_paths:
             setattr(self, f'path_{path}', f'{self.savepath}/{path}')
@@ -36,3 +36,6 @@ class FileManager:
 
     def filename_accs(self, network_id):
         return f'{self.savepath}/test_accuracies/{network_id}.npy'
+    
+    def filename_bitbybitaccs(self, network_id):
+        return f'{self.savepath}/test_accuracies_bit_by_bit/{network_id}.npy'

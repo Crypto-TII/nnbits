@@ -76,14 +76,15 @@ class RayNetwork(Network):
 # Create function to be parallelized
 # ---------------------------------------------------
 @ray.remote
-def parallelize(a, filemanager: FileManager, network_id):
+def parallelize(a, filemanager: FileManager, network_id, save_weights=False):
     a.create_model.remote()  # TODO: maybe this can be replaced by reset weights
     # a.reset_weights.remote()
     a.pass_filters.remote(network_id)
     a.pass_filters_test.remote(network_id)
     a.train.remote()
     a.save_history.remote(filemanager.filename_history(network_id))
-    # a.save_weights.remote(f.filename_h5(network_id)) # TODO: maybe uncomment
+    if save_weights:
+        a.save_weights.remote(filemanager.filename_h5(network_id)) # TODO: maybe uncomment
     ray.get(a.test.remote(filemanager.filename_accs(network_id))) # testing
     return f'finalized id {network_id}'
 
@@ -179,7 +180,10 @@ if __name__ == '__main__':
 
     # Train the Actors on the Filters
     # --------------------------------
-    tasks = pool.map(lambda actor, filter_id: parallelize.remote(actor, F, filter_id), range(config['N_FILTERS']))
+    tasks = pool.map(lambda actor, filter_id: parallelize.remote(actor, 
+                                                                 F, 
+                                                                 filter_id, 
+                                                                 save_weights=config['SAVE_WEIGHTS']), range(config['N_FILTERS']))
     for t in tasks:
         # if early stopping is desired, exit the actor training early
         if config['EARLY_STOPPING'] and (event_handler.best_pval < EARLY_STOPPING_P_VALUE):

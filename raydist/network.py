@@ -1,5 +1,5 @@
 from . import models
-from .metric import BitByBitAccuracy
+from .metric import BitByBitAccuracy, bitbybitaccuracy
 import numpy as np
 import pandas as pd
 
@@ -129,6 +129,24 @@ class Network(object):
             m.update_state(y_true, y_pred)
         np.save(filename, m.accs.numpy())
         return 0
+    
+    def test_details(self, filename): 
+        results = []
+        for model_input, y_true in [next(iter(self.ds_test))]:
+            y_pred = self.model.predict(model_input)
+            result = bitbybitaccuracy(y_true, y_pred, threshold=0.5, filename=None, get_accuracy=False, reduce=False)
+            results.append(result.numpy())
+        np.save(filename, np.array(results).flatten())
+        return 0
+    
+    def train_details(self, filename):
+        results = []
+        for model_input, y_true in [next(iter(self.ds_train))]:
+            y_pred = self.model.predict(model_input)
+            result = bitbybitaccuracy(y_true, y_pred, threshold=0.5, filename=None, get_accuracy=False, reduce=False)
+            results.append(result.numpy())
+        np.save(filename, np.array(results).flatten())
+        return 0       
 
     def save_history(self, filename):
         self.df_history.to_pickle(filename)

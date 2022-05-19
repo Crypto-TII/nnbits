@@ -28,7 +28,7 @@ def create_gohr_generalized_model(input_neurons=32, output_neurons=10, model_str
     reg_param = 10 ** -5
     final_activation = 'sigmoid'
 
-    optimizer = tf.keras.optimizers.Adam(learning_rate=0.002, amsgrad=True)  # 'Adam'
+    optimizer = tf.keras.optimizers.Adam(amsgrad=True) # tf.keras.optimizers.Adam(learning_rate=0.002, amsgrad=True)  # 'Adam'
     loss = 'mse'  # 'Huber'
 
     # loss = 'mse'

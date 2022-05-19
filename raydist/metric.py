@@ -1,7 +1,7 @@
 import tensorflow as tf
 
 
-def bitbybitaccuracy(y_true, y_pred, threshold=0.5, filename=None, get_accuracy=False):
+def bitbybitaccuracy(y_true, y_pred, threshold=0.5, filename=None, get_accuracy=False, reduce=True):
     # --- CAST y_pred to 0,1:
     # y_pred contains values which are not 0 or 1
     # based on the chosen threshold,
@@ -9,8 +9,9 @@ def bitbybitaccuracy(y_true, y_pred, threshold=0.5, filename=None, get_accuracy=
     # while 0.75 is cast to 1.
     # y_pred = tf.convert_to_tensor(y_pred)
     y_pred = y_pred.reshape(y_true.shape)
-    threshold = tf.cast(threshold, y_pred.dtype)
-    y_pred = tf.cast(y_pred > threshold, y_true.dtype)
+    threshold = tf.cast(threshold, tf.float32)
+    # y_pred = tf.cast(y_pred > threshold, y_true.dtype)
+    y_pred = tf.cast(y_pred > threshold, tf.uint8)
     """
     y_true = [[1,1,0],    [0,0,0], [1,1,1], [0,0,0]] 
     y_pred = [[1,0.75,0], [0,0,0], [1,1,1], [1,1,0]]
@@ -31,9 +32,10 @@ def bitbybitaccuracy(y_true, y_pred, threshold=0.5, filename=None, get_accuracy=
     --> 
     [3, 3, 4]
     """
-    result = tf.keras.backend.sum(result, axis=0)
-    if get_accuracy:
-        result = result / len(y_pred)
+    if reduce: 
+        result = tf.keras.backend.sum(result, axis=0)
+        if get_accuracy:
+            result = result / len(y_pred)
     return result
 
 
