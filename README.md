@@ -1,4 +1,4 @@
-# N-BEATS in Cryptanalysis | Distinguish Random Data from a Cipher Output
+# An Ensemble Deep Learning Distinguisher for Cryptanalysis | Distinguish Random Data from a Cipher Output
 
 _(This work has been submitted to JOURNAL and is currently under review)_
 
@@ -6,15 +6,22 @@ This is the code related to …
 
 This repository contains the following files:
 ```
-NBEATS-Cipher-Distinguisher
-|   |   README.md               <- the file which generates the current view
+raydist
+|   |   README.md               <-  the file which generates the current view
 |   |_
-|_  demo.ipynb                  <- demo notebook
-|_  distinguisher
-    |_  define_ensemble.py      <- defines an ensemble of N-BEATS (see `Methodology` and `Commands to Execute` below) 
-    |_  ensemble.py             <- trains or tests an ensemble of N-BEATS (see `Methodology` and `Commands to Execute` below)
-    |_  analyze_ensemble.py     <- performs an analysis of the test-data (see `Methodology` and `Commands to Execute` below) 
-    |_  utils                   <- contains files for dataset creation, file management, plot style, setting random seeds
+|_  demo.ipynb                  <-  demo notebook
+|_  raydist
+    |_  run.py                  <-  run the ensemble distinguisher (see `demo.ipynb`) 
+    |_  filters.py              <-  generates filters, see `Methodology` 
+    |_  metric.py               <-  defines a bit-by-bit accuracy as metric
+    |_  network.py              <-  handles routines for the deep-learning models in folder `models`
+    |_  models                  <-  contains the following deep learning models
+        |_  gohr_generalized.py     <-  a generalized version of Gohr's network
+        |_  resnet50.py             <-  ResNet50 implementation 
+        |_  vgg16.py                <-  VGG-16 implementation
+        |_  nbeats.py               <-  N-BEATS network 
+    |_  trainingtracker.py      <-  keeps track of the ensemble training progress
+    |_  filemanager.py          <-  keeps track of filenames
 ```
 
 A demo is available in Google Colab
@@ -29,46 +36,44 @@ The state-of-the-art (SOTA)
 * DIE-HARD(ER) statistical tests _"Name of paper"_  ([Paper](https://))
 * Avalanche test _"Name of paper"_  ([Paper](https://)) 
 * Gohr's deep neural networks distinguisher _"Improving Attacks on Round-Reduced Speck32/64 Using Deep Learning"_  ([Paper](https://doi.org/10.1007/978-3-030-26951-7_6.))
-* Machine learning & NIST as cryptographic distinguisher  _"Name of paper"_  ([Paper](https://))
-
 
 Methodology 
 ----
 
 An ensemble of deep neural networks is trained and tested on a `*.npy` file which contains sequences of potential random data.  
 
-1. Each ensemble member is defined by a dedicated configuration `*.cfg` file 
+1. Each ensemble member is defined by a `filter`: The respective filter will define some bits of the sequence as inputs to the neural network. The neural network will be trained to predict the remaining bits of the sequence. The number of filters, and therefore ensemble members is defined in the `*.cfg` file. 
 2. Each ensemble member is trained on the training data as defined in the `*.cfg` file 
 3. Each ensemble member is tested on the test data as defined in the `*.cfg` file 
-4. An analysis on the bit-level is performed on the test outcomes
 
 # Commands to Execute
 
-Assuming the data to be tested is located in `{data_path}`, 
-please run the following minimal set of commands:
-
-1. Create the `*.cfg` files
-```shell
-python -m distinguisher.define_ensemble --data_path '{data_path}' --save_path '{save_path}'
-``` 
-2. Train the ensemble
-```shell
-python -m distinguisher.ensemble -mode train --save_path '{save_path}'
-``` 
-3. Test the ensemble
-```shell
-python -m distinguisher.ensemble -mode test --save_path '{save_path}'
-``` 
-4. Analyze the outcome 
-```shell
-python -m distinguisher.analyze_ensemble --save_path '{save_path}'
+You should see an output as follows:
 ```
+====================================
+speck_32_64/round0_sequences300k.npy
+||           time            |   NN finished   | pred. bits ||  best bit  |  acc (%)   |   n pred   |  p value   ||
+===================================================================================================================
+||   2022-05-19_12h33m59s    |      0/100      |   0/1024   ||    nan     |    nan     |    nan     |    nan     ||
+||   2022-05-19_12h34m41s    |      1/100      |  63/1024   ||    143     |  100.000   |     1      |     0      ||
+||   2022-05-19_12h34m41s    |      3/100      |  122/1024  ||    237     |  100.000   |     1      |     0      ||
+...
+||   2022-05-19_12h34m42s    |     16/100      |  762/1024  ||    511     |  100.000   |     1      |     0      ||
+p-value is below limit ==> stop analysis.
+```
+* The `time` column gives a timestamp for the row and the rest of the row indicates the ensemble training status. 
+* `NN finished` is the neural networks which have already finalized their training. 
+*  `pred. bits` indicates how many bits of the total unit length were already present at the output of the `NN finished`. For example the avalanche unit of Speck 32 has a length of `1024` bits and in the last timesteps `762/1024` of those bits had been predicted by one of the neural networks.
+* `best bit` the bit which can be predicted with the highest accuracy:
+    * `acc` mean test accuracy of the `best bit` 
+    * `n pred` how many neural networks have already predicted `best bit`
+    * `p value` what is the p-value for the observation of `acc` 
 
 Running these commands will create a folder located in path `save_path` with the following structure
 ```
 save_path
-    |_  cfg             <- *.cfg ensemble configuration files (generated by calling define_ensemble.py)
-    |_  h5              <- *.h5 neural network model files (generated by calling train_ensemble.py)
+    cfg                 <- *.cfg ensemble configuration file
+    |_  h5              <- *.h5 neural network model files which contain the weights of each neural network
     |_  hist            <- *.pkl files which contain the training history of each ensemble member 
     |_  pred            <- *.npy files with the predictions of each ensemble member (generated by running test_ensemble.py)
 ```
