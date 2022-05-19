@@ -24,10 +24,6 @@ raydist
     |_  filemanager.py          <-  keeps track of filenames
 ```
 
-A demo is available in Google Colab
-
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Crypto-TII/nbeats_statistical_test/blob/main/demo.ipynb)
-
 # Introduction 
 
 The state-of-the-art (SOTA)
@@ -48,7 +44,11 @@ An ensemble of deep neural networks is trained and tested on a `*.npy` file whic
 
 # Commands to Execute
 
-You should see an output as follows:
+A demo is available in Google Colab
+
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Crypto-TII/nbeats_statistical_test/blob/main/demo.ipynb)
+
+The output gives the following information:
 ```
 ====================================
 speck_32_64/round0_sequences300k.npy
@@ -61,6 +61,8 @@ speck_32_64/round0_sequences300k.npy
 ||   2022-05-19_12h34m42s    |     16/100      |  762/1024  ||    511     |  100.000   |     1      |     0      ||
 p-value is below limit ==> stop analysis.
 ```
+Topmost is the `*.npy` file which has been analyzed by the ensemble. 
+The tabular output gives the following information in real-time during the training of the ensemble:
 * The `time` column gives a timestamp for the row and the rest of the row indicates the ensemble training status. 
 * `NN finished` is the neural networks which have already finalized their training. 
 *  `pred. bits` indicates how many bits of the total unit length were already present at the output of the `NN finished`. For example the avalanche unit of Speck 32 has a length of `1024` bits and in the last timesteps `762/1024` of those bits had been predicted by one of the neural networks.
