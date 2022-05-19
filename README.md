@@ -44,7 +44,7 @@ An ensemble of deep neural networks is trained and tested on a `*.npy` file whic
 
 # Commands to Execute
 
-A demo is available in Google Colab
+A [demo notebook](demo.ipynb) is included in this repository. To open the demo in Google Colab (allows to execute Python code directly in the browser and provides one GPU and one TPU for free) please click here
 
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Crypto-TII/nbeats_statistical_test/blob/main/demo.ipynb)
 
