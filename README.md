@@ -19,7 +19,7 @@ NBEATS-Cipher-Distinguisher
 
 A demo is available in Google Colab
 
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github//Crypto-TII/nbeats_statistical_test/demo.ipynb)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Crypto-TII/nbeats_statistical_test/blob/main/demo.ipynb)
 
 # Introduction 
 
