@@ -1,4 +1,5 @@
-def create_gohr_generalized_model(input_neurons=32, output_neurons=10, model_strength=1, set_memory_growth=True):
+def create_gohr_generalized_model(input_neurons=32, output_neurons=10, model_strength=1,
+                                  set_memory_growth=True):
     """
     CHANGE ME
     """
@@ -84,7 +85,7 @@ def create_gohr_generalized_model(input_neurons=32, output_neurons=10, model_str
 
     model.compile(loss=loss,
                   optimizer=optimizer,
-                  run_eagerly=False)  # , metrics=['acc'])
+                  run_eagerly=False)
 
     #     from gohr import cyclic_lr
     #     from keras.callbacks import LearningRateScheduler

@@ -1,0 +1,6 @@
+toml
+ray
+tensorflow
+watchdog
+
+scipy == 1.7.3

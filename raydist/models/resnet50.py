@@ -13,7 +13,7 @@ def create_resnet50_model(input_neurons=32, output_neurons=10, model_strength=1,
     from keras.layers import Input, Reshape, Concatenate, Dense
     from keras.applications.resnet import ResNet50
 
-    # add a reshaping to the input of VGG16
+    # add a reshaping
     img_size_target = int(np.sqrt(input_neurons))
 
     input_0 = Input(shape=(input_neurons,))

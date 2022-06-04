@@ -1,4 +1,6 @@
-def create_nbeats_model(input_neurons=32, output_neurons=10, model_strength=1, set_memory_growth=True):
+def create_nbeats_model(input_neurons=32, output_neurons=10, model_strength=1,
+                        set_memory_growth=True
+                        ):
     # --- prepare GPU
     import tensorflow as tf
     gpus = tf.config.experimental.list_physical_devices("GPU")

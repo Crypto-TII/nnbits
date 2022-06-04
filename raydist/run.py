@@ -43,7 +43,9 @@ class RayNetwork(Network):
                  set_memory_growth=True,
                  data_strategy='remove',
                  epochs=10,
-                 batchsize=4096):
+                 batchsize=4096,
+                 verbose=False,
+                 validation_batch_size=None):
         # --- GPU preparation
         import os
 
@@ -69,7 +71,9 @@ class RayNetwork(Network):
                          set_memory_growth,
                          data_strategy,
                          epochs,
-                         batchsize)
+                         batchsize,
+                         verbose,
+                         validation_batch_size)
 # ------------------------------
 
 # ---------------------------------------------------
@@ -84,8 +88,8 @@ def parallelize(a, filemanager: FileManager, network_id, save_weights=False):
     a.train.remote()
     a.save_history.remote(filemanager.filename_history(network_id))
     if save_weights:
-        a.save_weights.remote(filemanager.filename_h5(network_id)) # TODO: maybe uncomment
-    ray.get(a.test.remote(filemanager.filename_accs(network_id))) # testing
+        a.save_weights.remote(filemanager.filename_h5(network_id))
+    ray.get(a.test.remote(filemanager.filename_accs(network_id)))
     return f'finalized id {network_id}'
 
 def data_from_config(_config):
@@ -132,67 +136,110 @@ if __name__ == '__main__':
         input_filters = np.load(F.filename_filters())['input_filters']
         output_filters = np.load(F.filename_filters())['output_filters']
 
-    # CREATE THE RAY ACTOR POOL
-    # --------------------------------
-    # Initialize Ray
-    ray.init()
-    # Initialize a ray version of the network class with the correct number of
-    # GPU and CPU resources:
-    RayNetwork = ray.remote(num_gpus=config['NUM_GPUS'], num_cpus=config['NUM_CPUS'])(RayNetwork)
+    if config['N_FILTERS'] > 1:
+        # CREATE THE RAY ACTOR POOL
+        # --------------------------------
+        # Initialize Ray
+        ray.init()
+        # Initialize a ray version of the network class with the correct number of
+        # GPU and CPU resources:
+        RayNetwork = ray.remote(num_gpus=config['NUM_GPUS'], num_cpus=config['NUM_CPUS'])(RayNetwork)
 
-    # Store common and larger objects in the Ray Object Store:
-    data_train_id = ray.put(data_train)
-    data_val_id = ray.put(data_val)
-    input_filters_id = ray.put(input_filters)
-    output_filters_id = ray.put(output_filters)
+        # Store common and larger objects in the Ray Object Store:
+        data_train_id = ray.put(data_train)
+        data_val_id = ray.put(data_val)
+        input_filters_id = ray.put(input_filters)
+        output_filters_id = ray.put(output_filters)
 
-    # enable GPU memory growth if there is more than one actor per GPU
-    if config['N_ACTORS_PER_GPU'] > 1:
-        SET_MEMORY_GROWTH = True
-    else:
-        SET_MEMORY_GROWTH = False
-
-    # create a ray actor pool
-    Actors = [RayNetwork.remote([data_train_id,
-                                 data_val_id,
-                                 input_filters_id,
-                                 output_filters_id],
-                                _ % config['N_GPUS'],
-                                config['MODEL_ID'],
-                                config['MODEL_STRENGTH'],
-                                config['MODEL_INPUTS'],
-                                config['MODEL_OUTPUTS'],
-                                SET_MEMORY_GROWTH,
-                                config['DATA_STRATEGY'],
-                                config['N_EPOCHS'],
-                                config['BATCHSIZE']) for _ in range(config['N_GPUS'] * config['N_ACTORS_PER_GPU'])]
-    pool = ActorPool(Actors)
-
-    # Launch a Training Tracker
-    #--------------------------------
-    # (the training tracker will print relevant current training information)
-    from watchdog.observers import Observer
-
-    event_handler = TrainingTracker(savepath, logfile=F.filename_run_log())
-    observer = Observer()
-    observer.schedule(event_handler, path=F.path_test_accuracies, recursive=False)
-    observer.start()
-
-    # Train the Actors on the Filters
-    # --------------------------------
-    tasks = pool.map(lambda actor, filter_id: parallelize.remote(actor, 
-                                                                 F, 
-                                                                 filter_id, 
-                                                                 save_weights=config['SAVE_WEIGHTS']), range(config['N_FILTERS']))
-    for t in tasks:
-        # if early stopping is desired, exit the actor training early
-        if config['EARLY_STOPPING'] and (event_handler.best_pval < EARLY_STOPPING_P_VALUE):
-            terminate_actors = [actor.__ray_terminate__.remote() for actor in Actors]
-            print('p-value is below limit ==> stop analysis.')
-            break
+        # enable GPU memory growth if there is more than one actor per GPU
+        if config['N_ACTORS_PER_GPU'] > 1:
+            SET_MEMORY_GROWTH = True
         else:
-            pass
+            SET_MEMORY_GROWTH = False
 
-    # Clean up Actors and Training Tracker
-    kill_actors = [ray.kill(actor) for actor in Actors]
-    observer.stop()
+        # check if a validation batch size has been given (if not, simply the whole validation data will be passed in one go)
+        VALIDATION_BATCH_SIZE = None
+        if 'VALIDATION_BATCH_SIZE' in config:
+            VALIDATION_BATCH_SIZE = config['VALIDATION_BATCH_SIZE']
+
+        # create a ray actor pool
+        Actors = [RayNetwork.remote([data_train_id,
+                                     data_val_id,
+                                     input_filters_id,
+                                     output_filters_id],
+                                    _ % config['N_GPUS'],
+                                    config['MODEL_ID'],
+                                    config['MODEL_STRENGTH'],
+                                    config['MODEL_INPUTS'],
+                                    config['MODEL_OUTPUTS'],
+                                    SET_MEMORY_GROWTH,
+                                    config['DATA_STRATEGY'],
+                                    config['N_EPOCHS'],
+                                    config['BATCHSIZE'],
+                                    verbose=False,
+                                    validation_batch_size=VALIDATION_BATCH_SIZE,
+                                    ) for _ in range(config['N_GPUS'] * config['N_ACTORS_PER_GPU'])]
+        pool = ActorPool(Actors)
+
+        # Launch a Training Tracker
+        #--------------------------------
+        # (the training tracker will print relevant current training information)
+        from watchdog.observers import Observer
+
+        event_handler = TrainingTracker(savepath, logfile=F.filename_run_log())
+        observer = Observer()
+        observer.schedule(event_handler, path=F.path_test_accuracies, recursive=False)
+        observer.start()
+
+        # Train the Actors on the Filters
+        # --------------------------------
+        tasks = pool.map(lambda actor, filter_id: parallelize.remote(actor,
+                                                                     F,
+                                                                     filter_id,
+                                                                     save_weights=config['SAVE_WEIGHTS']), range(config['N_FILTERS']))
+        for t in tasks:
+            # if early stopping is desired, exit the actor training early
+            if config['EARLY_STOPPING'] and (event_handler.best_pval < EARLY_STOPPING_P_VALUE):
+                terminate_actors = [actor.__ray_terminate__.remote() for actor in Actors]
+                print('p-value is below limit ==> stop analysis.')
+                break
+            else:
+                pass
+
+        # Clean up Actors and Training Tracker
+        kill_actors = [ray.kill(actor) for actor in Actors]
+        observer.stop()
+
+    elif config['N_FILTERS'] == 1:
+        # TRAIN THE NETWORK WITHOUT A RAY ACTOR POOL
+        # --------------------------------
+        import os
+        os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
+
+        network = Network(data_train,
+                            data_val,
+                            input_filters,
+                            output_filters,
+                            config['MODEL_ID'],
+                            config['MODEL_STRENGTH'],
+                            config['MODEL_INPUTS'],
+                            config['MODEL_OUTPUTS'],
+                            False,
+                            config['DATA_STRATEGY'],
+                            config['N_EPOCHS'],
+                            config['BATCHSIZE'],
+                            verbose=True)
+
+        def parallelize(a, filemanager: FileManager, network_id, save_weights=False):
+            a.create_model()
+            a.pass_filters(network_id)
+            a.pass_filters_test(network_id)
+            a.train()
+            a.save_history(filemanager.filename_history(network_id))
+            if save_weights:
+                a.save_weights.remote(filemanager.filename_h5(network_id))  # TODO: maybe uncomment
+            #a.test(filemanager.filename_accs(network_id))  # testing
+            return f'finalized id {network_id}'
+
+        parallelize(network, F, 0)
+

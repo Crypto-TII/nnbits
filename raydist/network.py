@@ -16,7 +16,9 @@ class Network(object):
                  set_memory_growth=True,
                  data_strategy='remove',
                  epochs=10,
-                 batchsize=4096):
+                 batchsize=4096,
+                 verbose=False,
+                 validation_batch_size=None):
 
         self.data_train = data_train
         self.data_val = data_val
@@ -30,8 +32,13 @@ class Network(object):
         self.data_strategy = data_strategy
         self.epochs = epochs
         self.batchsize = batchsize
+        self.verbose = verbose
+        if validation_batch_size is None:
+            self.validation_batch_size = self.data_val.shape[0]
+        else:
+            self.validation_batch_size = validation_batch_size
 
-        # inferred class constants
+            # inferred class constants
         if data_strategy in ['remove', 'zero_gohr']:
             self.N_INPUT_BITS = input_filters.shape[1]
         elif data_strategy == 'zero':
@@ -46,6 +53,12 @@ class Network(object):
         # --- model preparation
         constructor = getattr(models, self.model_id)
         self.model = constructor(self.model_inputs, self.model_outputs, self.model_strength)
+
+        if self.verbose:
+            self.model.compile(optimizer=self.model.optimizer,
+                                loss=self.model.loss,
+                                run_eagerly=self.model.run_eagerly,
+                                metrics=self.model.metrics + ['acc'])
 
     def reset_weights(self):
         # from https://gist.github.com/jkleint/eb6dc49c861a1c21b612b568dd188668
@@ -88,8 +101,6 @@ class Network(object):
     def pass_filters_test(self, filter_id):
         import tensorflow as tf
 
-        N_VAL = self.data_val.shape[0]
-
         if self.data_strategy == 'remove':
             x = tf.gather(self.data_val, self.input_filters[filter_id], axis=1)
         elif self.data_strategy == 'zero':
@@ -109,15 +120,21 @@ class Network(object):
         ds_test = tf.data.Dataset.from_tensor_slices((x, y))
 
         ds_test = ds_test.cache()
-        ds_test = ds_test.batch(N_VAL)
+        ds_test = ds_test.batch(self.validation_batch_size)
         ds_test = ds_test.prefetch(tf.data.AUTOTUNE)
 
         self.ds_test = ds_test
 
     def train(self):
+
+        if self.verbose:
+            validation_data = self.ds_test
+        else:
+            validation_data = None
+
         history = self.model.fit(self.ds_train, epochs=self.epochs,
-                                 verbose=False,
-                                 #validation_data=self.ds_test,
+                                 verbose=self.verbose,
+                                 validation_data=validation_data,
                                  callbacks=self.model.callbacks)
         self.df_history = pd.DataFrame(history.history)
         return history.history
