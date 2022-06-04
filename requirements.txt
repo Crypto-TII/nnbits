@@ -1,6 +1,9 @@
+tensorflow
+numpy
+pandas
+matplotlib
 toml
 ray
-tensorflow
 watchdog
 
-scipy == 1.7.3
+scipy >= 1.7.3
