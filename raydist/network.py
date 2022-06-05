@@ -7,14 +7,14 @@ class Network(object):
     def __init__(self,
                  data_train,
                  data_val,
-                 input_filters,
-                 output_filters,
+                 selected_bits,
+                 not_selected_bits,
                  model_id,
                  model_strength,
                  model_inputs,
                  model_outputs,
-                 set_memory_growth=True,
-                 data_strategy='remove',
+                 input_data_op='None',
+                 predict_label=False,
                  epochs=10,
                  batchsize=4096,
                  verbose=False,
@@ -22,14 +22,15 @@ class Network(object):
 
         self.data_train = data_train
         self.data_val = data_val
-        self.input_filters = input_filters
-        self.output_filters = output_filters
+        self.selected_bits = selected_bits
+        self.not_selected_bits = not_selected_bits
 
         self.model_id = model_id
         self.model_strength = model_strength
         self.model_inputs = model_inputs
         self.model_outputs = model_outputs
-        self.data_strategy = data_strategy
+        self.input_data_op = input_data_op
+        self.predict_label = predict_label
         self.epochs = epochs
         self.batchsize = batchsize
         self.verbose = verbose
@@ -38,12 +39,19 @@ class Network(object):
         else:
             self.validation_batch_size = validation_batch_size
 
-            # inferred class constants
-        if data_strategy in ['remove', 'zero_gohr']:
-            self.N_INPUT_BITS = input_filters.shape[1]
-        elif data_strategy == 'zero':
-            self.N_INPUT_BITS = data_train.shape[1]
-        self.N_OUTPUT_BITS = output_filters.shape[1]
+        # # infer the number of input neurons
+        # if 'remove' in self.input_data_op:
+        #     self.N_INPUT_BITS = selected_bits.shape[1]
+        # else:
+        #     self.N_INPUT_BITS = data_train.shape[1]
+        #     # if there is a label in the data, subtract one:
+        #     if self.predict_label:
+        #         self.N_INPUT_BITS = self.N_INPUT_BITS-1
+
+        # # infer the number of output neurons
+        # self.N_OUTPUT_BITS = not_selected_bits.shape[1]
+        # if self.predict_label:
+        #     self.N_OUTPUT_BITS = 1
 
         # initialization
         self.create_model()
@@ -68,26 +76,37 @@ class Network(object):
         # weights = [np.random.permutation(w) for w in weights]
         self.model.set_weights(weights)
 
-    def pass_filters(self, filter_id):
+    def create_nn_dataset(self, data, selection_id):
+        import tensorflow as tf
+
+        if self.predict_label:
+            # gather only the bits until the second last one:
+            x = data[:, :-1]
+            y = tf.gather(data, [-1], axis=1)
+        else:
+            x = data.copy()
+            y = tf.gather(data, self.selected_bits[selection_id], axis=1)
+
+        if self.input_data_op == 'None':
+            pass
+
+        elif 'remove' in self.input_data_op:
+            # removing all selected bits is equivalent to gathering all not selected bits
+            x = tf.gather(x, self.not_selected_bits[selection_id], axis=1)
+
+        elif 'zero' in self.input_data_op:
+            # set the selected_bits to zero:
+            x[:, self.selected_bits[selection_id]] = 0
+            x = tf.convert_to_tensor(x)
+
+        return x, y
+
+    def pass_bit_selections(self, selection_id):
         import tensorflow as tf
 
         N_TRAIN = self.data_train.shape[0]
 
-        if self.data_strategy == 'remove':
-            x = tf.gather(self.data_train, self.input_filters[filter_id], axis=1)
-        elif self.data_strategy == 'zero':
-            x = self.data_train.copy()
-            x[:, self.output_filters[filter_id]] = 0
-            x = tf.convert_to_tensor(x)
-        elif self.data_strategy == 'zero_gohr':
-            x = self.data_train.copy()
-            # gather only the bits until the second last one:
-            x = x[:, :-1]
-            # set the target bit of the input filter to zero
-            x[:, self.input_filters[filter_id]] = 0
-            x = tf.convert_to_tensor(x)
-
-        y = tf.gather(self.data_train, self.output_filters[filter_id], axis=1)
+        x, y = self.create_nn_dataset(self.data_train, selection_id)
 
         ds_train = tf.data.Dataset.from_tensor_slices((x, y))
 
@@ -98,24 +117,10 @@ class Network(object):
 
         self.ds_train = ds_train
 
-    def pass_filters_test(self, filter_id):
+    def pass_bit_selections_test(self, selection_id):
         import tensorflow as tf
 
-        if self.data_strategy == 'remove':
-            x = tf.gather(self.data_val, self.input_filters[filter_id], axis=1)
-        elif self.data_strategy == 'zero':
-            x = self.data_val.copy()
-            x[:, self.output_filters[filter_id]] = 0
-            x = tf.convert_to_tensor(x)
-        elif self.data_strategy == 'zero_gohr':
-            x = self.data_val.copy()
-            # gather only the bits until the second last one:
-            x = x[:, :-1]
-            # set the target bit of the input filter to zero
-            x[:, self.input_filters[filter_id]] = 0
-            x = tf.convert_to_tensor(x)
-
-        y = tf.gather(self.data_val, self.output_filters[filter_id], axis=1)
+        x, y = self.create_nn_dataset(self.data_val, selection_id)
 
         ds_test = tf.data.Dataset.from_tensor_slices((x, y))
 
@@ -132,7 +137,8 @@ class Network(object):
         else:
             validation_data = None
 
-        history = self.model.fit(self.ds_train, epochs=self.epochs,
+        history = self.model.fit(self.ds_train,
+                                 epochs=self.epochs,
                                  verbose=self.verbose,
                                  validation_data=validation_data,
                                  callbacks=self.model.callbacks)
@@ -140,7 +146,7 @@ class Network(object):
         return history.history
 
     def test(self, filename):
-        m = BitByBitAccuracy(self.N_OUTPUT_BITS)
+        m = BitByBitAccuracy(self.model_outputs)
         for model_input, y_true in [next(iter(self.ds_test))]:
             y_pred = self.model.predict(model_input)
             m.update_state(y_true, y_pred)

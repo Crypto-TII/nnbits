@@ -5,22 +5,22 @@ import numpy as np
 from .filemanager import FileManager
 
 def get_X(F):
-    config = toml.load(F.filename_cfg())
+    config = toml.load(F.filename_config())
 
-    X = np.empty((config['N_FILTERS'], config['N_BITS']))
+    X = np.empty((config['NEURAL_NETWORKS'], config['RESULTING N TOTAL BITS']))
     X[:] = np.NaN
 
     network_id = 0
 
-    filename = F.filename_filters()
-    _filters = np.load(filename)
-    input_filters, output_filters = _filters['input_filters'], _filters['output_filters']
+    filename = F.filename_selections()
+    _selections = np.load(filename)
+    selected_bits, not_selected_bits = _selections['selected_bits'], _selections['not_selected_bits']
 
-    for filter_id in np.arange(config['N_FILTERS']):
+    for filter_id in np.arange(config['NEURAL_NETWORKS']):
         filename = F.filename_accs(network_id)
         if os.path.isfile(filename):
             x = np.load(filename)
-            X[network_id][output_filters[filter_id]] = x
+            X[network_id][selected_bits[filter_id]] = x
 
         network_id += 1
 
@@ -69,7 +69,7 @@ def get_pvalue(n_trials, obs_mean):
 class BitAnalysis:
     def __init__(self, savepath):
         self.F = FileManager(savepath)
-        config = toml.load(self.F.filename_cfg())
+        config = toml.load(self.F.filename_config())
         self.n_trials = config['N_VAL']
 
     def update(self):

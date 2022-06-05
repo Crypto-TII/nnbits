@@ -23,9 +23,9 @@ class TrainingTracker(FileSystemEventHandler):
         self.logfile = logfile
 
         self.F = FileManager(savepath)
-        config = toml.load(self.F.filename_cfg())
-        self.n_bits = config['N_BITS']
-        self.n_ensemble = np.sum(config['N_FILTERS'])
+        config = toml.load(self.F.filename_config())
+        self.n_bits = config['RESULTING N TOTAL BITS']
+        self.n_ensemble = np.sum(config['NEURAL_NETWORKS'])
 
         self.bitanalysis = BitAnalysis(savepath)
 
