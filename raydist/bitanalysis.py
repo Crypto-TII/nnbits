@@ -7,7 +7,10 @@ from .filemanager import FileManager
 def get_X(F):
     config = toml.load(F.filename_config())
 
-    X = np.empty((config['NEURAL_NETWORKS'], config['RESULTING N TOTAL BITS']))
+    if config['PREDICT_LABEL']:
+        X = np.empty((config['NEURAL_NETWORKS'], config['RESULTING N TOTAL BITS'] + 1))
+    else:
+        X = np.empty((config['NEURAL_NETWORKS'], config['RESULTING N TOTAL BITS']))
     X[:] = np.NaN
 
     network_id = 0

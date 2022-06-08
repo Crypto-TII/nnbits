@@ -2,6 +2,7 @@ import numpy as np
 import toml
 import argparse
 import pandas as pd
+import datetime
 
 import ray
 from ray.util import ActorPool
@@ -26,6 +27,7 @@ def configure_argparse():
         help='The name of the folder in which to find the configuration file (as in example_config.cfg) and in which to save the analysis files.')
     _args = parser.parse_args()
     return _args
+
 
 # ---------------------------------------------------
 # Initialize a ray version of the network:
@@ -74,6 +76,7 @@ class RayNetwork(Network):
                          validation_batch_size)
 # ------------------------------
 
+
 # ---------------------------------------------------
 # Create function to be parallelized
 # ---------------------------------------------------
@@ -93,12 +96,16 @@ def parallelize(a, filemanager: FileManager, network_id, save_weights=False):
 # ---------------------------------------------------
 # Various configuration functions
 # ---------------------------------------------------
+
+
 def config_add_optional_defaults(_config):
     """
     If an argument is not provided in config and the argument is optional,
     this function sets the default values.
     """
-    optional_defaults = {'PREDICT_LABEL': False,
+    optional_defaults = {'INPUT_DATA_OP': 'None',
+                         'SELECT_BITS_STRATEGY': 'None',
+                         'PREDICT_LABEL': False,
                          'TARGET_BITS': [],
                          'N_RANDOM_BITS': 0,
                          'EARLY_STOPPING': True,
@@ -109,11 +116,6 @@ def config_add_optional_defaults(_config):
                          'SAVE_WEIGHTS': False,
                          }
 
-    # # check if a validation batch size has been given (if not, simply the whole validation data will be passed in one go)
-    # VALIDATION_BATCH_SIZE = None
-    # if 'VALIDATION_BATCH_SIZE' in config:
-    #     VALIDATION_BATCH_SIZE = config['VALIDATION_BATCH_SIZE']
-
     for key in optional_defaults:
         if key in _config:
             pass
@@ -121,11 +123,13 @@ def config_add_optional_defaults(_config):
             _config[key] = optional_defaults[key]
     return _config
 
+
 def data_from_config(_config):
     data = np.load(_config['DATAPATH'])
     _data_train = data.take(np.arange(0, _config['N_TRAIN']), axis=0)
     _data_val = data.take(np.arange(_config['N_TRAIN'], _config['N_TRAIN'] + _config['N_VAL']), axis=0)
     return _data_train, _data_val
+
 
 def bit_selections_from_config(_config, filename=None):
     """
@@ -144,12 +148,18 @@ def bit_selections_from_config(_config, filename=None):
     """
     # initialize the selections
 
-    selection_constructor = getattr(selections, _config['SELECT_BITS_STRATEGY'])
-    _selected_bits, _not_selected_bits = selection_constructor(_config['NEURAL_NETWORKS'],
-                                                         _config['RESULTING N SELECTED BITS'],
-                                                         _config['RESULTING N TOTAL BITS'],
-                                                         make_uniform=True,
-                                                         list_of_target_bits=_config['TARGET_BITS'])
+    if _config['SELECT_BITS_STRATEGY'] != 'None':
+        selection_constructor = getattr(selections, _config['SELECT_BITS_STRATEGY'])
+        _selected_bits, _not_selected_bits = selection_constructor(_config['NEURAL_NETWORKS'],
+                                                             _config['RESULTING N SELECTED BITS'],
+                                                             _config['RESULTING N TOTAL BITS'],
+                                                             make_uniform=True,
+                                                             list_of_target_bits=_config['TARGET_BITS'])
+    else:
+        assert _config['PREDICT_LABEL'] is True
+        label_position = _config['RESULTING BITS IN DATA-ROW'] - 1
+        _selected_bits = [[label_position]]*_config['NEURAL_NETWORKS']
+        _not_selected_bits = [[]]*_config['NEURAL_NETWORKS']
 
     if filename:
         np.savez(filename,
@@ -185,6 +195,10 @@ def inferred_config_settings(_config, data_train_shape, data_val_shape):
 
     _config['RESULTING BITS IN DATA-ROW'] = data_train_shape[1]
 
+    # potential config clean up steps
+    if _config['SELECT_BITS_STRATEGY'] == 'target':
+        _config['TARGET_BITS'] = clean_target_bits_list(_config['TARGET_BITS'])
+
     # Infer the number of selected bits:
     if _config['SELECT_BITS_STRATEGY'] == 'random':
         _config['RESULTING N SELECTED BITS'] = _config['N_RANDOM_BITS']
@@ -215,14 +229,13 @@ def inferred_config_settings(_config, data_train_shape, data_val_shape):
     if _config['VALIDATION_BATCH_SIZE'] is None:
         _config['VALIDATION_BATCH_SIZE'] = data_val_shape[0]
 
-    # potential config clean up steps
-    if _config['SELECT_BITS_STRATEGY'] == 'target':
-        _config['TARGET_BITS'] = clean_target_bits_list(_config['TARGET_BITS'])
-
     return _config
 
 if __name__ == '__main__':
 
+    # ===========================================================#
+    # PARSE ARGUMENTS AND SETTINGS
+    #===========================================================#
     # Parse arguments from command line
     args = configure_argparse()
 
@@ -232,13 +245,25 @@ if __name__ == '__main__':
     config = toml.load(F.filename_config())
     config = config_add_optional_defaults(config)
 
-    # Prepare data
+    # ===========================================================#
+    # PREPARE DATA
+    #===========================================================#
+    # timing info
+    strf_time = datetime.datetime.now().strftime('%Y-%m-%d_%Hh%Mm%Ss')
+    print(f'{strf_time} \t started to load data from harddisk...')
+    # data preparation
     data_train, data_val = data_from_config(config)
+    # timing info
+    strf_time = datetime.datetime.now().strftime('%Y-%m-%d_%Hh%Mm%Ss')
+    print(f'{strf_time} \t finished.')
 
+    # ===========================================================#
+    # INFER REMAINING SETTINGS
+    # ===========================================================#
     # Infer config settings
     config = inferred_config_settings(config, data_train.shape, data_val.shape)
 
-    # Print configuration
+    # Print configuration information
     print("="*70)
     df = pd.DataFrame.from_dict(config, orient='index', columns=['value'])
     print(df.to_markdown())
@@ -247,13 +272,18 @@ if __name__ == '__main__':
     with open(F.filename_config(), 'w') as configfile:
         toml.dump(config, configfile)
 
-    # Prepare bit selections
+    # ===========================================================#
+    # PREPARE BIT SELECTIONS
+    #===========================================================#
     if config['CREATE_NEW_SELECTIONS']:
         selected_bits, not_selected_bits = bit_selections_from_config(config, filename=F.filename_selections())
     else:
         selected_bits = np.load(F.filename_selections())['selected_bits']
         not_selected_bits = np.load(F.filename_selections())['not_selected_bits']
 
+    # ===========================================================#
+    # RUN THE POOL OF NEURAL NETWORKS
+    #===========================================================#
     if config['NEURAL_NETWORKS'] > 1:
         # CREATE THE RAY ACTOR POOL
         # --------------------------------
@@ -323,6 +353,9 @@ if __name__ == '__main__':
         kill_actors = [ray.kill(actor) for actor in Actors]
         observer.stop()
 
+    # ===========================================================#
+    # ... OR ONLY TRAIN A SINGLE NEURAL NETWORK:
+    #===========================================================#
     elif config['NEURAL_NETWORKS'] == 1:
         # TRAIN THE NETWORK WITHOUT A RAY ACTOR POOL
         # --------------------------------
@@ -353,7 +386,7 @@ if __name__ == '__main__':
             a.save_history(filemanager.filename_history(network_id))
             if save_weights:
                 a.save_weights.remote(filemanager.filename_h5(network_id))  # TODO: maybe uncomment
-            #a.test(filemanager.filename_accs(network_id))  # testing
+            a.test(filemanager.filename_accs(network_id))  # testing
             return f'finalized id {network_id}'
 
         parallelize(network, F, 0)

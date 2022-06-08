@@ -82,7 +82,8 @@ class Network(object):
         if self.predict_label:
             # gather only the bits until the second last one:
             x = data[:, :-1]
-            y = tf.gather(data, [-1], axis=1)
+            label_position = self.data_train.shape[1]-1
+            y = tf.gather(data, [label_position], axis=1)
         else:
             x = data.copy()
             y = tf.gather(data, self.selected_bits[selection_id], axis=1)
@@ -96,6 +97,7 @@ class Network(object):
 
         elif 'zero' in self.input_data_op:
             # set the selected_bits to zero:
+            x = x.copy()
             x[:, self.selected_bits[selection_id]] = 0
             x = tf.convert_to_tensor(x)
 
