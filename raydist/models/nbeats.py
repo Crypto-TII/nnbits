@@ -1,18 +1,23 @@
 def create_nbeats_model(input_neurons=32, output_neurons=10, model_strength=1,
                         set_memory_growth=True
                         ):
-    # --- prepare GPU
+    # ---------------------------------------------------
+    # Prepare GPU
+    # ---------------------------------------------------
     import tensorflow as tf
     gpus = tf.config.experimental.list_physical_devices("GPU")
     tf.config.experimental.set_visible_devices(gpus[0], 'GPU')
     if set_memory_growth:
         tf.config.experimental.set_memory_growth(gpus[0], True)
 
-    # --- prepare model
-    from tensorflow import keras
-    from keras import layers
+    # ---------------------------------------------------
+    # Imports
+    # ---------------------------------------------------
     from nbeats_keras.model import NBeatsNet as NBeatsKeras
 
+    # ---------------------------------------------------
+    # Model parameters
+    # ---------------------------------------------------
     optimizer = 'Adam'
     loss = 'Huber'  # keras.losses.BinaryCrossentropy(from_logits=True)
     stack_types = ['generic'] * 6
@@ -21,6 +26,9 @@ def create_nbeats_model(input_neurons=32, output_neurons=10, model_strength=1,
     hidden_layer_units = int(64 * model_strength)
     share_weights_in_stack = False
 
+    # ---------------------------------------------------
+    # Model definition
+    # ---------------------------------------------------
     model = NBeatsKeras(backcast_length=input_neurons,
                         forecast_length=output_neurons,
                         stack_types=stack_types,
@@ -29,11 +37,16 @@ def create_nbeats_model(input_neurons=32, output_neurons=10, model_strength=1,
                         share_weights_in_stack=share_weights_in_stack,
                         hidden_layer_units=hidden_layer_units)
 
+    # ---------------------------------------------------
+    # Model compilation
+    # ---------------------------------------------------
     model.compile(loss=loss,
                   optimizer=optimizer,
                   run_eagerly=False)
-    # metrics=['accuracy'])
 
+    # ---------------------------------------------------
+    # Model callbacks
+    # ---------------------------------------------------
     model.callbacks = []
 
     return model

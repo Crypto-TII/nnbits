@@ -1,15 +1,17 @@
 def create_gohr_generalized_model(input_neurons=32, output_neurons=10, model_strength=1,
                                   set_memory_growth=True):
-    """
-    CHANGE ME
-    """
-    # --- prepare GPU
+    # ---------------------------------------------------
+    # Prepare GPU
+    # ---------------------------------------------------
     import tensorflow as tf
     gpus = tf.config.experimental.list_physical_devices("GPU")
     tf.config.experimental.set_visible_devices(gpus[0], 'GPU')
     if set_memory_growth:
         tf.config.experimental.set_memory_growth(gpus[0], True)
 
+    # ---------------------------------------------------
+    # Imports
+    # ---------------------------------------------------
     from keras.models import Model
     from keras.layers import Dense, Conv1D, Conv2D, Input, Reshape, Permute, Add, Flatten, BatchNormalization, \
         Activation
@@ -17,6 +19,9 @@ def create_gohr_generalized_model(input_neurons=32, output_neurons=10, model_str
     from keras.regularizers import l2
     import numpy as np
 
+    # ---------------------------------------------------
+    # Model parameters
+    # ---------------------------------------------------
     img_sqrt = int(np.sqrt(input_neurons))
 
     # num_blocks=2
@@ -30,10 +35,11 @@ def create_gohr_generalized_model(input_neurons=32, output_neurons=10, model_str
     final_activation = 'sigmoid'
 
     optimizer = tf.keras.optimizers.Adam(amsgrad=True) # tf.keras.optimizers.Adam(learning_rate=0.002, amsgrad=True)  # 'Adam'
-    loss = 'mse'  # 'Huber'
+    loss = 'mse'
 
-    # loss = 'mse'
-
+    # ---------------------------------------------------
+    # Model definition
+    # ---------------------------------------------------
     # put input in square shape instead of word-like structure
     inp = Input(shape=(input_neurons,));
     # rs = Reshape((2 * num_blocks, word_size))(inp);
@@ -54,24 +60,6 @@ def create_gohr_generalized_model(input_neurons=32, output_neurons=10, model_str
         conv2 = Activation('relu')(conv2);
         shortcut = Add()([shortcut, conv2]);
 
-    # ---- search correlations in the other direction
-    #     perm = Permute((2,1))(rs);
-    #     conv0 = Conv1D(num_filters, kernel_size=1, padding='same', kernel_regularizer=l2(reg_param))(perm); # changed
-    #     conv0 = BatchNormalization()(conv0);
-    #     conv0 = Activation('relu')(conv0);
-    #     shortcut1 = conv0;
-    #     for i in range(depth):
-    #         conv1 = Conv1D(num_filters, kernel_size=ks, padding='same', kernel_regularizer=l2(reg_param))(shortcut1);
-    #         conv1 = BatchNormalization()(conv1);
-    #         conv1 = Activation('relu')(conv1);
-    #         conv2 = Conv1D(num_filters, kernel_size=ks, padding='same',kernel_regularizer=l2(reg_param))(conv1);
-    #         conv2 = BatchNormalization()(conv2);
-    #         conv2 = Activation('relu')(conv2);
-    #         shortcut1 = Add()([shortcut1, conv2]);
-
-    # ---- bring them together
-    # shortcut = Concatenate()([shortcut, shortcut1])#Add()([shortcut, shortcut1])
-    # add prediction head
     flat1 = Flatten()(shortcut);
     dense1 = Dense(d1, kernel_regularizer=l2(reg_param))(flat1);
     dense1 = BatchNormalization()(dense1);
@@ -83,13 +71,16 @@ def create_gohr_generalized_model(input_neurons=32, output_neurons=10, model_str
     model = Model(inputs=inp, outputs=out);
     # -------------#-------------#-------------#-------------#
 
+    # ---------------------------------------------------
+    # Model compilation
+    # ---------------------------------------------------
     model.compile(loss=loss,
                   optimizer=optimizer,
                   run_eagerly=False)
 
-    #     from gohr import cyclic_lr
-    #     from keras.callbacks import LearningRateScheduler
-    #     lr = LearningRateScheduler(cyclic_lr(10,0.002, 0.0001));
+    # ---------------------------------------------------
+    # Model callbacks
+    # ---------------------------------------------------
+    model.callbacks = []
 
-    model.callbacks = []  # [lr]
     return model
