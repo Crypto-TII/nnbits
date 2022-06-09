@@ -1,4 +1,4 @@
-# NNBits: Use a Neural Network Ensemble to analyze a cipher bit by bit
+# NNBits: Use a neural network ensemble to analyze a cipher bit by bit
 
 _(This work has been submitted to JOURNAL and is currently under review)_
 
