@@ -24,17 +24,15 @@ def create_gohr_generalized_model(input_neurons=32, output_neurons=10, model_str
     # ---------------------------------------------------
     img_sqrt = int(np.sqrt(input_neurons))
 
-    # num_blocks=2
-    num_filters = 32 * 4 #* model_strength
-    d1 = 64 #* model_strength
-    d2 = 64 #* model_strength
-    # word_size=16
+    num_filters = 32 * 4
+    d1 = 64
+    d2 = 64
     ks = 3
     depth = model_strength
     reg_param = 10 ** -5
     final_activation = 'sigmoid'
 
-    optimizer = tf.keras.optimizers.Adam(amsgrad=True) # tf.keras.optimizers.Adam(learning_rate=0.002, amsgrad=True)  # 'Adam'
+    optimizer = tf.keras.optimizers.Adam(amsgrad=True)
     loss = 'mse'
 
     # ---------------------------------------------------
@@ -69,7 +67,6 @@ def create_gohr_generalized_model(input_neurons=32, output_neurons=10, model_str
     dense2 = Activation('relu')(dense2);
     out = Dense(output_neurons, activation=final_activation, kernel_regularizer=l2(reg_param))(dense2);
     model = Model(inputs=inp, outputs=out);
-    # -------------#-------------#-------------#-------------#
 
     # ---------------------------------------------------
     # Model compilation
