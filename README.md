@@ -26,19 +26,14 @@ nnbits
 
 # Introduction 
 
-The state-of-the-art (SOTA)
-----
-* NIST statistical tests _"Name of paper"_  ([Paper](https://))
-* DIE-HARD(ER) statistical tests _"Name of paper"_  ([Paper](https://))
-* Avalanche test _"Name of paper"_  ([Paper](https://)) 
-* Gohr's deep neural networks distinguisher _"Improving Attacks on Round-Reduced Speck32/64 Using Deep Learning"_  ([Paper](https://doi.org/10.1007/978-3-030-26951-7_6.))
+
 
 Methodology 
 ----
 
 An ensemble of deep neural networks is trained and tested on a `*.npy` file which contains sequences of potential random data.  
 
-1. Each ensemble member is defined by a `filter`: The respective filter will define some bits of the sequence as inputs to the neural network. The neural network will be trained to predict the remaining bits of the sequence. The number of filters, and therefore ensemble members is defined in the `*.cfg` file. 
+1. Each ensemble member is defined by a `selection`: The respective bit selection will define some bits of the sequence as inputs to the neural network. The neural network will be trained to predict the remaining bits of the sequence. The number of filters, and therefore ensemble members is defined in the `*.cfg` file. 
 2. Each ensemble member is trained on the training data as defined in the `*.cfg` file 
 3. Each ensemble member is tested on the test data as defined in the `*.cfg` file 
 
