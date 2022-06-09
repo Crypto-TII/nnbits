@@ -6,11 +6,11 @@ This is the code related to …
 
 This repository contains the following files:
 ```
-raydist
+nnbits
 |   |   README.md               <-  the file which generates the current view
 |   |_
 |_  demo.ipynb                  <-  demo notebook
-|_  raydist
+|_  nnbits
     |_  run.py                  <-  run the ensemble distinguisher (see `demo.ipynb`) 
     |_  filters.py              <-  generates filters, see `Methodology` 
     |_  metric.py               <-  defines a bit-by-bit accuracy as metric
