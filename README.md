@@ -1,4 +1,4 @@
-# An Ensemble Deep Learning Distinguisher for Cryptanalysis | Distinguish Random Data from a Cipher Output
+# NNBits: An Ensemble Deep Learning Distinguisher for Cryptanalysis | Distinguish Random Data from a Cipher Output
 
 _(This work has been submitted to JOURNAL and is currently under review)_
 
