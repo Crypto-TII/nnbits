@@ -137,6 +137,11 @@ final   = np.r_[train, val]
 np.save('nnbits_dataset.npy', final)
 ```
 
+# Adding a New Model
+1. Add your TensorFlow model `my_model.py` to the folder `models/`. 
+2. Add your TensorFlow model to the initialization file `models/__init__.py` by adding a line `from .my_model import create_model_routine as my_model_id`
+3. Call NNBits and set the configuration parameter `'NEURAL_NETWORK_MODEL': 'my_model_id'`
+
 # Citation
 If you use this code in your work, please cite the following [paper]()
 ```
