@@ -1,8 +1,18 @@
+- [NNBits: Use a neural network ensemble to analyze a cipher bit by bit](#nnbits--use-a-neural-network-ensemble-to-analyze-a-cipher-bit-by-bit)
+- [Introduction](#introduction)
+  * [Methodology](#methodology)
+- [Commands to Execute](#commands-to-execute)
+  * [Set GPU parameters](#set-gpu-parameters)
+  * [Expected Data Format](#expected-data-format)
+    + [Hint for Dataset Preparation](#hint-for-dataset-preparation)
+- [Adding a New Model](#adding-a-new-model)
+- [Citation](#citation)
+
+<small><i><a href='http://ecotrust-canada.github.io/markdown-toc/'>Table of contents generated with markdown-toc</a></i></small>
+
 # NNBits: Use a neural network ensemble to analyze a cipher bit by bit
 
 _(This work has been submitted to JOURNAL and is currently under review)_
-
-This is the code related to …
 
 This repository contains the following files:
 ```
@@ -25,8 +35,6 @@ nnbits
 ```
 
 # Introduction 
-
-
 
 Methodology 
 ----
