@@ -120,6 +120,23 @@ The `{data_path}` contains a single `*.npy` file with X sequences of length 1024
 array([0, 0, 0, ..., 1, 0, 1], dtype=uint8)
 ```
 
+### Hint for Dataset Preparation
+Often machine learning data is saved in the format of `X.npy`, `Y.npy` `X_val.npy`, `Y_val.npy`. The following routine produces a dataset of the expected format for `NNBits`: 
+```python 
+#load training and validation data
+X = np.load('X.npy')
+Y = np.load('Y.npy')
+X_val = np.load('X_val.npy')
+Y_val = np.load('Y_val.npy')
+#combine the data: concatenate Y as a column to X
+train   = np.c_[X, Y]
+val     = np.c_[X_val, Y_val]
+#combine the data: concatenate rows
+final   = np.r_[train, val]
+#save final
+np.save('nnbits_dataset.npy', final)
+```
+
 # Citation
 If you use this code in your work, please cite the following [paper]()
 ```
