@@ -39,3 +39,6 @@ class FileManager:
     
     def filename_bitbybitaccs(self, network_id):
         return f'{self.savepath}/test_accuracies_bit_by_bit/{network_id}.npy'
+
+    def filename_bitbybit_test_accs(self, network_id):
+        return f"{self.savepath}/test_accuracies_bit_by_bit/{network_id}_testing.npy"

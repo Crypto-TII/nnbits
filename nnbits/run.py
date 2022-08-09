@@ -45,7 +45,8 @@ class RayNetwork(Network):
                  epochs=10,
                  batchsize=4096,
                  verbose=False,
-                 validation_batch_size=None):
+                 validation_batch_size=None,
+                 testing_batch_size=None):
         # --- GPU preparation
         import os
 
@@ -58,6 +59,7 @@ class RayNetwork(Network):
         self.data_val = ray.get(obj_refs[1])
         self.selected_bits = ray.get(obj_refs[2])
         self.not_selected_bits = ray.get(obj_refs[3])
+        self.data_test = ray.get(obj_refs[4])
 
         # --- Network preparation
         super().__init__(self.data_train,
@@ -73,7 +75,9 @@ class RayNetwork(Network):
                          epochs,
                          batchsize,
                          verbose,
-                         validation_batch_size)
+                         validation_batch_size,
+                         testing_batch_size,
+                         self.data_test)
 # ------------------------------
 
 
@@ -85,13 +89,49 @@ def parallelize(a, filemanager: FileManager, network_id, save_weights=False):
     a.create_model.remote()  # TODO: maybe this can be replaced by reset weights
     # a.reset_weights.remote()
     a.pass_bit_selections.remote(network_id)
-    a.pass_bit_selections_test.remote(network_id)
+    a.pass_bit_selections_validation.remote(network_id)
     a.train.remote()
     a.save_history.remote(filemanager.filename_history(network_id))
     if save_weights:
         a.save_weights.remote(filemanager.filename_h5(network_id))
-    ray.get(a.test.remote(filemanager.filename_accs(network_id)))
+    ray.get(a.validate.remote(filemanager.filename_accs(network_id)))
+    # testing
+    #a.pass_bit_selections_testing.remote(network_id)
+    #ray.get(a.testing_details.remote(filemanager.filename_bitbybit_test_accs(network_id)))
     return f'finalized id {network_id}'
+
+# ---------------------------------------------------
+# Create a testing-only function to be parallelized
+# ---------------------------------------------------
+@ray.remote
+def parallelize_testing_only(a, filemanager: FileManager, network_id):
+    a.create_model.remote()
+    a.load_weights.remote(filemanager.filename_h5(network_id))
+    a.pass_bit_selections_testing.remote(network_id)
+    ray.get(a.testing_details.remote(filemanager.filename_bitbybit_test_accs(network_id)))
+    return f'finalized id {network_id}'
+
+def print_testing_results(filemanager: FileManager):
+    print("")
+    print("TEST RESULTS")
+    print("============")
+
+    print('All neural networks have been tested.')
+    print("""You can load the correctness of each single bit prediction via
+          >>> y_pred = np.load(F.filename_bitbybit_test_accs(nn))
+          >>> accuracy = y_pred.sum()/len(y_pred)*100
+
+The test accuracies calculated as above are as follows:""")
+
+    import numpy as np
+    rows = []
+    for nn in np.arange(config['NEURAL_NETWORKS']):
+        y_pred = np.load(filemanager.filename_bitbybit_test_accs(nn))
+        rows.append([nn, y_pred.sum() / len(y_pred) * 100])
+
+    import pandas as pd
+    df = pd.DataFrame(rows, columns=['network ID', 'test accuracy (%)'])
+    print(df.to_markdown(index=False))
 
 # ---------------------------------------------------
 # Various configuration functions
@@ -114,6 +154,9 @@ def config_add_optional_defaults(_config):
                          'MODEL_STRENGTH': 1,
                          'VALIDATION_BATCH_SIZE': None,
                          'SAVE_WEIGHTS': False,
+                         'N_TEST': 0,
+                         'TESTING_BATCH_SIZE': 'None',
+                         'TEST_ONLY': False,
                          }
 
     for key in optional_defaults:
@@ -128,7 +171,15 @@ def data_from_config(_config):
     data = np.load(_config['DATAPATH'])
     _data_train = data.take(np.arange(0, _config['N_TRAIN']), axis=0)
     _data_val = data.take(np.arange(_config['N_TRAIN'], _config['N_TRAIN'] + _config['N_VAL']), axis=0)
-    return _data_train, _data_val
+    # prepare test data
+    if _config['N_TEST'] == 0:
+        _data_test = None
+    else:
+        _data_test = data.take(np.arange(
+                                        _config['N_TRAIN'] + _config['N_VAL'],
+                                    _config['N_TRAIN'] + _config['N_VAL'] + _config['N_TEST']), 
+            axis=0)
+    return _data_train, _data_val, _data_test
 
 
 def bit_selections_from_config(_config, filename=None):
@@ -179,7 +230,7 @@ def clean_target_bits_list(target_bits_list):
         target_bits_list = [[_] for _ in target_bits_list]
     return target_bits_list
 
-def inferred_config_settings(_config, data_train_shape, data_val_shape):
+def inferred_config_settings(_config, data_train_shape, data_val_shape, data_test_shape):
     """
     Example:
         config = {
@@ -226,8 +277,12 @@ def inferred_config_settings(_config, data_train_shape, data_val_shape):
         _config['RESULTING NN OUTPUT NEURONS'] = _config['RESULTING N SELECTED BITS']
 
     # Infer the validation batch size:
-    if _config['VALIDATION_BATCH_SIZE'] is None:
+    if _config['VALIDATION_BATCH_SIZE'] == 'None':
         _config['VALIDATION_BATCH_SIZE'] = data_val_shape[0]
+
+    # Infer the testing batch size:
+    if _config['TESTING_BATCH_SIZE'] == 'None':
+        _config['TESTING_BATCH_SIZE'] = data_test_shape[0]
 
     return _config
 
@@ -252,7 +307,7 @@ if __name__ == '__main__':
     strf_time = datetime.datetime.now().strftime('%Y-%m-%d_%Hh%Mm%Ss')
     print(f'{strf_time} \t started to load data from harddisk...')
     # data preparation
-    data_train, data_val = data_from_config(config)
+    data_train, data_val, data_test = data_from_config(config)
     # timing info
     strf_time = datetime.datetime.now().strftime('%Y-%m-%d_%Hh%Mm%Ss')
     print(f'{strf_time} \t finished.')
@@ -261,7 +316,7 @@ if __name__ == '__main__':
     # INFER REMAINING SETTINGS
     # ===========================================================#
     # Infer config settings
-    config = inferred_config_settings(config, data_train.shape, data_val.shape)
+    config = inferred_config_settings(config, data_train.shape, data_val.shape, data_test.shape)
 
     # Print configuration information
     print("="*70)
@@ -298,8 +353,8 @@ if __name__ == '__main__':
         data_val_id = ray.put(data_val)
         selected_bits_id = ray.put(selected_bits)
         not_selected_bits_id = ray.put(not_selected_bits)
-
-        # # enable GPU memory growth if there is more than one actor per GPU
+        data_test_id = ray.put(data_test)
+# # enable GPU memory growth if there is more than one actor per GPU
         # if config['N_ACTORS_PER_GPU'] > 1:
         #     SET_MEMORY_GROWTH = True
         # else:
@@ -309,7 +364,8 @@ if __name__ == '__main__':
         Actors = [RayNetwork.remote([data_train_id,
                                      data_val_id,
                                      selected_bits_id,
-                                     not_selected_bits_id],
+                                     not_selected_bits_id, 
+                                     data_test_id],
                                     _ % config['N_GPUS'],
                                     config['NEURAL_NETWORK_MODEL'],
                                     config['MODEL_STRENGTH'],
@@ -321,6 +377,7 @@ if __name__ == '__main__':
                                     config['BATCHSIZE'],
                                     verbose=False,
                                     validation_batch_size=config['VALIDATION_BATCH_SIZE'],
+                                    testing_batch_size=config['TESTING_BATCH_SIZE'],
                                     ) for _ in range(config['N_GPUS'] * config['N_ACTORS_PER_GPU'])]
         pool = ActorPool(Actors)
 
@@ -334,12 +391,24 @@ if __name__ == '__main__':
         observer.schedule(event_handler, path=F.path_test_accuracies, recursive=False)
         observer.start()
 
-        # Train the Actors on the Filters
+        # Parallelize Tasks of the Actors on the Filters
         # --------------------------------
-        tasks = pool.map(lambda actor, filter_id: parallelize.remote(actor,
+        if config['TEST_ONLY'] != False:
+            # only test existing neural networks
+            tasks = pool.map(lambda actor, filter_id: parallelize_testing_only.remote(actor,
+                                                                         F,
+                                                                         filter_id),
+                             range(config['NEURAL_NETWORKS']))
+            print_testing_results(F)
+
+        else:
+            # train, validate, and test
+            tasks = pool.map(lambda actor, filter_id: parallelize.remote(actor,
                                                                      F,
                                                                      filter_id,
-                                                                     save_weights=config['SAVE_WEIGHTS']), range(config['NEURAL_NETWORKS']))
+                                                                     save_weights=config['SAVE_WEIGHTS']),
+                                                        range(config['NEURAL_NETWORKS']))
+
         for t in tasks:
             # if early stopping is desired, exit the actor training early
             if config['EARLY_STOPPING'] and (event_handler.best_pval < config['EARLY_STOPPING_P_VALUE']):
@@ -349,7 +418,7 @@ if __name__ == '__main__':
             else:
                 pass
 
-        # Clean up Actors and Training Tracker
+        # Clea_teting_onln up Actors and Training Tracker
         kill_actors = [ray.kill(actor) for actor in Actors]
         observer.stop()
 
@@ -381,7 +450,7 @@ if __name__ == '__main__':
         def parallelize(a, filemanager: FileManager, network_id, save_weights=False):
             a.create_model()
             a.pass_bit_selections(network_id)
-            a.pass_bit_selections_test(network_id)
+            a.pass_bit_selections_validation(network_id)
             a.train()
             a.save_history(filemanager.filename_history(network_id))
             if save_weights:

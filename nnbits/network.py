@@ -18,10 +18,13 @@ class Network(object):
                  epochs=10,
                  batchsize=4096,
                  verbose=False,
-                 validation_batch_size=None):
+                 validation_batch_size=None,
+                 testing_batch_size=None,
+                 data_test=None):
 
         self.data_train = data_train
         self.data_val = data_val
+        self.data_test = data_test
         self.selected_bits = selected_bits
         self.not_selected_bits = not_selected_bits
 
@@ -38,6 +41,10 @@ class Network(object):
             self.validation_batch_size = self.data_val.shape[0]
         else:
             self.validation_batch_size = validation_batch_size
+        if testing_batch_size is None:
+            self.testing_batch_size = self.data_test.shape[0]
+        else:
+            self.testing_batch_size = testing_batch_size
 
         # # infer the number of input neurons
         # if 'remove' in self.input_data_op:
@@ -119,18 +126,31 @@ class Network(object):
 
         self.ds_train = ds_train
 
-    def pass_bit_selections_test(self, selection_id):
+    def pass_bit_selections_testing(self, selection_id):
         import tensorflow as tf
 
-        x, y = self.create_nn_dataset(self.data_val, selection_id)
+        x, y = self.create_nn_dataset(self.data_test, selection_id)
 
         ds_test = tf.data.Dataset.from_tensor_slices((x, y))
 
         ds_test = ds_test.cache()
-        ds_test = ds_test.batch(self.validation_batch_size)
+        ds_test = ds_test.batch(self.testing_batch_size)
         ds_test = ds_test.prefetch(tf.data.AUTOTUNE)
 
         self.ds_test = ds_test
+
+    def pass_bit_selections_validation(self, selection_id):
+        import tensorflow as tf
+
+        x, y = self.create_nn_dataset(self.data_val, selection_id)
+
+        ds_val = tf.data.Dataset.from_tensor_slices((x, y))
+
+        ds_val = ds_val.cache()
+        ds_val = ds_val.batch(self.validation_batch_size)
+        ds_val = ds_val.prefetch(tf.data.AUTOTUNE)
+
+        self.ds_val = ds_val
 
     def train(self):
 
@@ -147,6 +167,14 @@ class Network(object):
         self.df_history = pd.DataFrame(history.history)
         return history.history
 
+    def validate(self, filename):
+        m = BitByBitAccuracy(self.model_outputs)
+        for model_input, y_true in [next(iter(self.ds_val))]:
+            y_pred = self.model.predict(model_input)
+            m.update_state(y_true, y_pred)
+        np.save(filename, m.accs.numpy())
+        return 0
+
     def test(self, filename):
         m = BitByBitAccuracy(self.model_outputs)
         for model_input, y_true in [next(iter(self.ds_test))]:
@@ -154,10 +182,19 @@ class Network(object):
             m.update_state(y_true, y_pred)
         np.save(filename, m.accs.numpy())
         return 0
-    
-    def test_details(self, filename): 
+
+    def testing_details(self, filename):
         results = []
         for model_input, y_true in [next(iter(self.ds_test))]:
+            y_pred = self.model.predict(model_input)
+            result = bitbybitaccuracy(y_true, y_pred, threshold=0.5, filename=None, get_accuracy=False, reduce=False)
+            results.append(result.numpy())
+        np.save(filename, np.array(results).flatten())
+        return 0
+
+    def validation_details(self, filename):
+        results = []
+        for model_input, y_true in [next(iter(self.ds_val))]:
             y_pred = self.model.predict(model_input)
             result = bitbybitaccuracy(y_true, y_pred, threshold=0.5, filename=None, get_accuracy=False, reduce=False)
             results.append(result.numpy())
