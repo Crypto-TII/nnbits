@@ -11,6 +11,8 @@ class FileManager:
         # create sub-directories if not available:
         make_paths = ['h5', 'hist', 'bit_selections', 'test_accuracies', 'test_accuracies_bit_by_bit']
 
+        self.path_test_accuracies = f'{self.savepath}/test_accuracies'
+
         for path in make_paths:
             setattr(self, f'path_{path}', f'{self.savepath}/{path}')
 
