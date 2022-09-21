@@ -3,12 +3,12 @@
 
 _(This work has been submitted to FSE'22 and is currently under review)_
 
-- [Repository Structure](#repository-structure)
+- [Repository structure](#repository-structure)
 - [Methodology](#methodology)
 - [Demo](#demo)
 - [How to set GPU parameters](#how-to-set-gpu-parameters)
-- [How to prepare the Dataset](#how-to-prepare-the-dataset)
-- [How to add a New Model](#how-to-add-a-new-model)
+- [How to prepare the dataset](#how-to-prepare-the-dataset)
+- [How to add a new model](#how-to-add-a-new-model)
 - [Citation](#citation)
 
 <small><i><a href='http://ecotrust-canada.github.io/markdown-toc/'>Table of contents generated with markdown-toc</a></i></small>
