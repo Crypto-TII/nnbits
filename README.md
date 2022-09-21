@@ -1,7 +1,7 @@
 
 # NNBits: Use a neural network ensemble to analyze a cipher bit by bit
 
-_(This work has been submitted to JOURNAL and is currently under review)_
+_(This work has been submitted to FSE'22 and is currently under review)_
 
 - [Repository Structure](#repository-structure)
 - [Methodology](#methodology)
