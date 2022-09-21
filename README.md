@@ -13,7 +13,7 @@ _(This work has been submitted to FSE'22 and is currently under review)_
 
 <small><i><a href='http://ecotrust-canada.github.io/markdown-toc/'>Table of contents generated with markdown-toc</a></i></small>
 
-# Repository Structure 
+# Repository structure 
 This repository contains the following files:
 ```
 nnbits
@@ -114,7 +114,7 @@ Sun May 22 10:41:14 2022
 +-------------------------------+----------------------+----------------------+
 ```
 
-# How to prepare the Dataset
+# How to prepare the dataset
 The `{data_path}` contains a single `*.npy` file with X sequences of length 1024 bits for SPECK 32/64, for example:
 ```python 
 >>> filename = '/home/anna/NBEATSD4/data_5rounds_1000000_samples.npy'
@@ -141,7 +141,7 @@ final   = np.r_[train, val]
 np.save('nnbits_dataset.npy', final)
 ```
 
-# How to add a New Model
+# How to add a new model
 1. Add your TensorFlow model `my_model.py` to the folder `models/`. 
 2. Add your TensorFlow model to the initialization file `models/__init__.py` by adding a line 
    ```python 
