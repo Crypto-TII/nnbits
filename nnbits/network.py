@@ -37,6 +37,7 @@ class Network(object):
         self.epochs = epochs
         self.batchsize = batchsize
         self.verbose = verbose
+        self.model_save_best_weights = False
         if validation_batch_size is None:
             self.validation_batch_size = self.data_val.shape[0]
         else:
@@ -152,10 +153,25 @@ class Network(object):
 
         self.ds_val = ds_val
 
+    def add_best_weights_callback(self, filename):
+
+        def make_checkpoint(_filename):
+            from keras.callbacks import ModelCheckpoint
+            res = ModelCheckpoint(_filename,
+                                  monitor='val_acc',
+                                  save_weights_only=True,
+                                  save_best_only=True)
+            return res
+
+
+        check = make_checkpoint(filename)
+        self.model.callbacks += [check]
+        self.model_save_best_weights = True
+
     def train(self):
 
-        if self.verbose:
-            validation_data = self.ds_test
+        if self.verbose or self.model_save_best_weights:
+            validation_data = self.ds_val
         else:
             validation_data = None
 

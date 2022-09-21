@@ -78,6 +78,8 @@ class RayNetwork(Network):
                          validation_batch_size,
                          testing_batch_size,
                          self.data_test)
+
+
 # ------------------------------
 
 
@@ -85,24 +87,28 @@ class RayNetwork(Network):
 # Create function to be parallelized
 # ---------------------------------------------------
 @ray.remote
-def parallelize(a, filemanager: FileManager, network_id, save_weights=False):
+def parallelize(a, filemanager: FileManager, network_id, save_weights=False, save_best_weights=False):
     a.create_model.remote()  # TODO: maybe this can be replaced by reset weights
     # a.reset_weights.remote()
     a.pass_bit_selections.remote(network_id)
     a.pass_bit_selections_validation.remote(network_id)
+    if save_best_weights:
+        a.add_best_weights_callback.remote(filemanager.filename_h5(network_id))
     a.train.remote()
     a.save_history.remote(filemanager.filename_history(network_id))
     if save_weights:
         a.save_weights.remote(filemanager.filename_h5(network_id))
     ray.get(a.validate.remote(filemanager.filename_accs(network_id)))
     # testing
-    #a.pass_bit_selections_testing.remote(network_id)
-    #ray.get(a.testing_details.remote(filemanager.filename_bitbybit_test_accs(network_id)))
+    # a.pass_bit_selections_testing.remote(network_id)
+    # ray.get(a.testing_details.remote(filemanager.filename_bitbybit_test_accs(network_id)))
     return f'finalized id {network_id}'
+
 
 # ---------------------------------------------------
 # Create a testing-only function to be parallelized
 # ---------------------------------------------------
+
 @ray.remote
 def parallelize_testing_only(a, filemanager: FileManager, network_id):
     a.create_model.remote()
@@ -110,6 +116,7 @@ def parallelize_testing_only(a, filemanager: FileManager, network_id):
     a.pass_bit_selections_testing.remote(network_id)
     ray.get(a.testing_details.remote(filemanager.filename_bitbybit_test_accs(network_id)))
     return f'finalized id {network_id}'
+
 
 def print_testing_results(filemanager: FileManager):
     print("")
@@ -133,6 +140,7 @@ The test accuracies calculated as above are as follows:""")
     df = pd.DataFrame(rows, columns=['network ID', 'test accuracy (%)'])
     print(df.to_markdown(index=False))
 
+
 # ---------------------------------------------------
 # Various configuration functions
 # ---------------------------------------------------
@@ -154,6 +162,7 @@ def config_add_optional_defaults(_config):
                          'MODEL_STRENGTH': 1,
                          'VALIDATION_BATCH_SIZE': None,
                          'SAVE_WEIGHTS': False,
+                         'SAVE_BEST_WEIGHTS': False,
                          'N_TEST': 0,
                          'TESTING_BATCH_SIZE': 'None',
                          'TEST_ONLY': False,
@@ -176,8 +185,8 @@ def data_from_config(_config):
         _data_test = None
     else:
         _data_test = data.take(np.arange(
-                                        _config['N_TRAIN'] + _config['N_VAL'],
-                                    _config['N_TRAIN'] + _config['N_VAL'] + _config['N_TEST']), 
+            _config['N_TRAIN'] + _config['N_VAL'],
+            _config['N_TRAIN'] + _config['N_VAL'] + _config['N_TEST']),
             axis=0)
     return _data_train, _data_val, _data_test
 
@@ -202,15 +211,15 @@ def bit_selections_from_config(_config, filename=None):
     if _config['SELECT_BITS_STRATEGY'] != 'None':
         selection_constructor = getattr(selections, _config['SELECT_BITS_STRATEGY'])
         _selected_bits, _not_selected_bits = selection_constructor(_config['NEURAL_NETWORKS'],
-                                                             _config['RESULTING N SELECTED BITS'],
-                                                             _config['RESULTING N TOTAL BITS'],
-                                                             make_uniform=True,
-                                                             list_of_target_bits=_config['TARGET_BITS'])
+                                                                   _config['RESULTING N SELECTED BITS'],
+                                                                   _config['RESULTING N TOTAL BITS'],
+                                                                   make_uniform=True,
+                                                                   list_of_target_bits=_config['TARGET_BITS'])
     else:
         assert _config['PREDICT_LABEL'] is True
         label_position = _config['RESULTING BITS IN DATA-ROW'] - 1
-        _selected_bits = [[label_position]]*_config['NEURAL_NETWORKS']
-        _not_selected_bits = [[]]*_config['NEURAL_NETWORKS']
+        _selected_bits = [[label_position]] * _config['NEURAL_NETWORKS']
+        _not_selected_bits = [[]] * _config['NEURAL_NETWORKS']
 
     if filename:
         np.savez(filename,
@@ -218,6 +227,7 @@ def bit_selections_from_config(_config, filename=None):
                  not_selected_bits=_not_selected_bits)
 
     return _selected_bits, _not_selected_bits
+
 
 def clean_target_bits_list(target_bits_list):
     """
@@ -229,6 +239,7 @@ def clean_target_bits_list(target_bits_list):
     if isinstance(target_bits_list[0], int):
         target_bits_list = [[_] for _ in target_bits_list]
     return target_bits_list
+
 
 def inferred_config_settings(_config, data_train_shape, data_val_shape, data_test_shape):
     """
@@ -286,11 +297,12 @@ def inferred_config_settings(_config, data_train_shape, data_val_shape, data_tes
 
     return _config
 
+
 if __name__ == '__main__':
 
     # ===========================================================#
     # PARSE ARGUMENTS AND SETTINGS
-    #===========================================================#
+    # ===========================================================#
     # Parse arguments from command line
     args = configure_argparse()
 
@@ -302,7 +314,7 @@ if __name__ == '__main__':
 
     # ===========================================================#
     # PREPARE DATA
-    #===========================================================#
+    # ===========================================================#
     # timing info
     strf_time = datetime.datetime.now().strftime('%Y-%m-%d_%Hh%Mm%Ss')
     print(f'{strf_time} \t started to load data from harddisk...')
@@ -319,7 +331,7 @@ if __name__ == '__main__':
     config = inferred_config_settings(config, data_train.shape, data_val.shape, data_test.shape)
 
     # Print configuration information
-    print("="*70)
+    print("=" * 70)
     df = pd.DataFrame.from_dict(config, orient='index', columns=['value'])
     print(df.to_markdown())
     print('\n')
@@ -329,7 +341,7 @@ if __name__ == '__main__':
 
     # ===========================================================#
     # PREPARE BIT SELECTIONS
-    #===========================================================#
+    # ===========================================================#
     if config['CREATE_NEW_SELECTIONS']:
         selected_bits, not_selected_bits = bit_selections_from_config(config, filename=F.filename_selections())
     else:
@@ -338,7 +350,7 @@ if __name__ == '__main__':
 
     # ===========================================================#
     # RUN THE POOL OF NEURAL NETWORKS
-    #===========================================================#
+    # ===========================================================#
     if config['NEURAL_NETWORKS'] > 1:
         # CREATE THE RAY ACTOR POOL
         # --------------------------------
@@ -354,7 +366,7 @@ if __name__ == '__main__':
         selected_bits_id = ray.put(selected_bits)
         not_selected_bits_id = ray.put(not_selected_bits)
         data_test_id = ray.put(data_test)
-# # enable GPU memory growth if there is more than one actor per GPU
+        # # enable GPU memory growth if there is more than one actor per GPU
         # if config['N_ACTORS_PER_GPU'] > 1:
         #     SET_MEMORY_GROWTH = True
         # else:
@@ -364,7 +376,7 @@ if __name__ == '__main__':
         Actors = [RayNetwork.remote([data_train_id,
                                      data_val_id,
                                      selected_bits_id,
-                                     not_selected_bits_id, 
+                                     not_selected_bits_id,
                                      data_test_id],
                                     _ % config['N_GPUS'],
                                     config['NEURAL_NETWORK_MODEL'],
@@ -382,7 +394,7 @@ if __name__ == '__main__':
         pool = ActorPool(Actors)
 
         # Launch a Training Tracker
-        #--------------------------------
+        # --------------------------------
         # (the training tracker will print relevant current training information)
         from watchdog.observers import Observer
 
@@ -393,21 +405,20 @@ if __name__ == '__main__':
 
         # Parallelize Tasks of the Actors on the Filters
         # --------------------------------
-        if config['TEST_ONLY'] != False:
+        if config['TEST_ONLY']:
             # only test existing neural networks
             tasks = pool.map(lambda actor, filter_id: parallelize_testing_only.remote(actor,
-                                                                         F,
-                                                                         filter_id),
-                             range(config['NEURAL_NETWORKS']))
-            print_testing_results(F)
-
+                                                                                      F,
+                                                                                      filter_id),
+                             list(range(config['NEURAL_NETWORKS'])))
         else:
             # train, validate, and test
             tasks = pool.map(lambda actor, filter_id: parallelize.remote(actor,
-                                                                     F,
-                                                                     filter_id,
-                                                                     save_weights=config['SAVE_WEIGHTS']),
-                                                        range(config['NEURAL_NETWORKS']))
+                                                                         F,
+                                                                         filter_id,
+                                                                         save_weights=config['SAVE_WEIGHTS'],
+                                                                         save_best_weights=config['SAVE_BEST_WEIGHTS']),
+                             list(range(config['NEURAL_NETWORKS'])))
 
         for t in tasks:
             # if early stopping is desired, exit the actor training early
@@ -418,17 +429,20 @@ if __name__ == '__main__':
             else:
                 pass
 
+        if config['TEST_ONLY']: print_testing_results(F)
+
         # Clea_teting_onln up Actors and Training Tracker
         kill_actors = [ray.kill(actor) for actor in Actors]
         observer.stop()
 
     # ===========================================================#
     # ... OR ONLY TRAIN A SINGLE NEURAL NETWORK:
-    #===========================================================#
+    # ===========================================================#
     elif config['NEURAL_NETWORKS'] == 1:
         # TRAIN THE NETWORK WITHOUT A RAY ACTOR POOL
         # --------------------------------
         import os
+
         os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
         network = Network(data_train,
@@ -445,18 +459,34 @@ if __name__ == '__main__':
                           config['BATCHSIZE'],
                           verbose=True,
                           validation_batch_size=config['VALIDATION_BATCH_SIZE'],
+                          testing_batch_size=config['TESTING_BATCH_SIZE'],
+                          data_test=data_test
                           )
 
-        def parallelize(a, filemanager: FileManager, network_id, save_weights=False):
-            a.create_model()
-            a.pass_bit_selections(network_id)
-            a.pass_bit_selections_validation(network_id)
-            a.train()
-            a.save_history(filemanager.filename_history(network_id))
-            if save_weights:
-                a.save_weights.remote(filemanager.filename_h5(network_id))  # TODO: maybe uncomment
-            a.test(filemanager.filename_accs(network_id))  # testing
-            return f'finalized id {network_id}'
+        if config['TEST_ONLY'] == False:
+            def parallelize(a, filemanager: FileManager, network_id, save_weights=False):
+                a.create_model()
+                a.pass_bit_selections(network_id)
+                a.pass_bit_selections_validation(network_id)
+                a.train()
+                a.save_history(filemanager.filename_history(network_id))
+                if save_weights:
+                    a.save_weights.remote(filemanager.filename_h5(network_id))  # TODO: maybe uncomment
+                a.test(filemanager.filename_accs(network_id))  # testing
+                return f'finalized id {network_id}'
 
-        parallelize(network, F, 0)
 
+            parallelize(network, F, 0)
+
+        else:
+            def parallelize_testing_only(a, filemanager: FileManager, network_id):
+                a.create_model()
+                a.load_weights(filemanager.filename_h5(network_id))
+                a.pass_bit_selections_testing(network_id)
+                a.testing_details(filemanager.filename_bitbybit_test_accs(network_id))
+                return f'finalized id {network_id}'
+
+
+            parallelize_testing_only(network, F, 0)
+
+            print_testing_results(F)
