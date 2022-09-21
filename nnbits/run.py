@@ -182,7 +182,7 @@ def data_from_config(_config):
     _data_val = data.take(np.arange(_config['N_TRAIN'], _config['N_TRAIN'] + _config['N_VAL']), axis=0)
     # prepare test data
     if _config['N_TEST'] == 0:
-        _data_test = None
+        _data_test = np.array([])
     else:
         _data_test = data.take(np.arange(
             _config['N_TRAIN'] + _config['N_VAL'],
