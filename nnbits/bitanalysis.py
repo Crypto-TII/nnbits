@@ -22,7 +22,7 @@ def get_X(F):
     for filter_id in np.arange(config['NEURAL_NETWORKS']):
         filename = F.filename_accs(network_id)
         if os.path.isfile(filename):
-            x = np.load(filename)
+            x = np.load(filename, allow_pickle=True)
             X[network_id][selected_bits[filter_id]] = x
 
         network_id += 1
