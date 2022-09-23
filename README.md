@@ -16,7 +16,98 @@ _(This work has been submitted to FSE'22 and is currently under review)_
 
 <small><i><a href='http://ecotrust-canada.github.io/markdown-toc/'>Table of contents generated with markdown-toc</a></i></small>
 
-# Demo 
+# Demos 
+
+## Command line interface
+```bash
+# clone repository
+git clone https://github.com/Crypto-TII/nnbits
+# change working directory
+cd nnbits/
+# install requirements
+pip install -r requirements.txt
+# create dataset directory
+mkdir 'speck_32_64'
+# create working directory for analysis results
+mkdir 'demo_speck32_roundid6'
+```
+
+Create a configuration file `config.cfg` file in the working directory (e.g. via `vim 'demo_speck32_roundid6/config.cfg'`) with the following content:
+```python
+DATAPATH = "speck_32_64/round6_sequences300k.npy"
+# ensemble settings
+NEURAL_NETWORK_MODEL = "gohr_generalized"
+NEURAL_NETWORKS = 100
+SELECT_BITS_STRATEGY = "random"
+INPUT_DATA_OP = "zero"
+N_RANDOM_BITS = 63
+# hardware settings
+N_GPUS = 1
+N_ACTORS_PER_GPU = 1
+GPU_PER_ACTOR = 1
+CPU_PER_ACTOR = 1
+# training settings
+N_EPOCHS = 5
+N_TRAIN = 145000
+N_VAL = 145000
+N_TEST = 0
+BATCHSIZE = 5000
+```
+
+Run in Python 
+```python 
+#### Create the dataset ######
+number_of_samples = 300_000
+
+from avalanche_data_generator.speck_32_64 import speck_k64_p32_o32_r22 as data_generator
+import numpy as np
+
+dataset = data_generator.generate_avalanche_dataset(int(number_of_samples))
+
+np.save(f"speck_32_64/round6_sequences300k.npy", dataset[6])
+```
+
+Run the NNBits ensemble analysis:
+```bash
+python -m nnbits.run --savepath 'demo_speck32_roundid6'
+```
+
+Analyze the outcome (Python):
+```python 
+from nnbits.filemanager import FileManager
+F = FileManager('demo_speck32_roundid6') 
+
+from nnbits.bitanalysis import get_X
+X = get_X(F)
+
+# the bit accuracies are calculated by taking the mean over all neural networks which predict the particular bit 
+# (axis=0):
+# (the following three lines catch a runtime warning if a mean-calculation is empty. This happens if not all bits have been analyzed yet.)
+import warnings
+import numpy as np
+with warnings.catch_warnings():
+    warnings.simplefilter("ignore", category=RuntimeWarning)
+    bit_accuracies = np.nanmean(X, axis=0)
+	
+best_bit_id = np.nanargmax(bit_accuracies)
+print(best_bit_id, bit_accuracies[best_bit_id])
+	
+import matplotlib.pyplot as plt
+
+# here we visualize the obtained `bit_accuracies`:
+plt.figure(figsize=(10, 3), dpi=150)
+plt.plot(bit_accuracies, 'o', markersize=3, linestyle = 'None', label="mean validation accuracy of each bit")
+
+plt.plot(best_bit_id, bit_accuracies[best_bit_id], marker='x', c='C0', linestyle = 'None', label=f"best bit {int(best_bit_id)} with {float(bit_accuracies[best_bit_id])*100:.1f}% accuracy")
+
+plt.legend(loc='upper left')
+plt.xlabel('bit id')
+plt.ylabel('validation accuracy')
+plt.gcf().savefig('result.png', bbox_inches='tight')
+```![image](https://user-images.githubusercontent.com/73515327/191897762-5d3b988b-1dea-4f4e-996e-0045698c27f0.png)
+
+
+## Jupyter Notebook
 
 A [demo notebook](demo.ipynb) is included in this repository. To open the demo in Google Colab (allows to execute Python code directly in the browser and provides one GPU and one TPU for free) please click here
 
