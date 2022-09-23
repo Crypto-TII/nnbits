@@ -5,7 +5,14 @@ We introduce a deep learning ensemble (NNBits) as a tool for bit-profiling and e
 
 _(This work has been submitted to FSE'22 and is currently under review)_
 
-- [Demo](#demo)
+- [Demos](#demos)
+  * [Command line interface](#command-line-interface)
+    + [Clone repository and create folders](#clone-repository-and-create-folders)
+    + [Create a configuration file](#create-a-configuration-file)
+    + [Create the dataset](#create-the-dataset)
+    + [Run the NNBits analysis](#run-the-nnbits-analysis)
+    + [Analyze the outcome](#analyze-the-outcome)
+  * [Jupyter Notebook](#jupyter-notebook)
 - [Technical background information](#technical-background-information)
   * [Methodology](#methodology)
   * [`nnbits` structure](#-nnbits--structure)
@@ -109,7 +116,8 @@ plt.legend(loc='upper left')
 plt.xlabel('bit id')
 plt.ylabel('validation accuracy')
 plt.gcf().savefig('result.png', bbox_inches='tight')
-```![image](https://user-images.githubusercontent.com/73515327/191897762-5d3b988b-1dea-4f4e-996e-0045698c27f0.png)
+```
+![image](https://user-images.githubusercontent.com/73515327/191898706-0b18f16a-e04d-4711-8222-8fdb0a3e7ff0.png)
 
 
 ## Jupyter Notebook
