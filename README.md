@@ -36,9 +36,9 @@ A [demo notebook](demo.ipynb) is included in this repository. Please clone the r
 ```bash
 git clone https://github.com/Crypto-TII/nnbits
 cd nnbits
-pip install -r requirements.txt
+pip3 install -r requirements.txt
 ```
-Launch the demo notebook.
+In `conda` you can install Jupyter Lab via `conda install -c conda-forge jupyterlab` and launch Jupyter Lab via `jupyter lab`.
 
 <!-- To open the demo in Google Colab (allows to execute Python code directly in the browser and provides one GPU and one TPU for free) please click here
 
