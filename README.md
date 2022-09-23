@@ -14,11 +14,6 @@ _(This work has been submitted to FSE'22 and is currently under review)_
 
 - [Demos](#demos)
   * [Command line interface](#command-line-interface)
-    + [Clone repository and create folders](#clone-repository-and-create-folders)
-    + [Create a configuration file](#create-a-configuration-file)
-    + [Create the dataset](#create-the-dataset)
-    + [Run the NNBits analysis](#run-the-nnbits-analysis)
-    + [Analyze the outcome](#analyze-the-outcome)
   * [Jupyter Notebook](#jupyter-notebook)
 - [Background information](#background-information)
   * [Methodology](#methodology)
