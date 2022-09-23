@@ -13,8 +13,8 @@ We introduce a deep learning ensemble (NNBits) as a tool for bit-profiling and e
 _(This work has been submitted to FSE'22 and is currently under review)_
 
 - [Demos](#demos)
-  * [Command line interface](#command-line-interface)
   * [Jupyter Notebook](#jupyter-notebook)
+  * [Command line interface](#command-line-interface)
 - [Background information](#background-information)
   * [Methodology](#methodology)
   * [Repository structure](#repository-structure)
