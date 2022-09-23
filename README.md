@@ -36,7 +36,7 @@ A [demo notebook](demo.ipynb) is included in this repository. Please clone the r
 ```bash
 git clone https://github.com/Crypto-TII/nnbits
 cd nnbits
-pip3 install -r requirements.txt
+pip install -r requirements.txt
 ```
 In `conda` you can install Jupyter Lab via `conda install -c conda-forge jupyterlab` and launch Jupyter Lab via `jupyter lab`.
 
