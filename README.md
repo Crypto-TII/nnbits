@@ -72,9 +72,9 @@ INPUT_DATA_OP = "zero"
 N_RANDOM_BITS = 63
 # hardware settings <------------ adjust according to your GPU hardware (check with nvidia-smi)
 N_GPUS = 4 			# how many GPUs do you have available?
-N_ACTORS_PER_GPU = 4		# divide the GPU memory by XXX for training a generalized Gohr's network on the avalanche dataset of Speck32/64
+N_ACTORS_PER_GPU = 4		# divide the GPU memory by ~3800 MiB for training a generalized Gohr's network on the avalanche dataset of Speck32/64
 GPU_PER_ACTOR = 0.25		# <= 1/N_ACTORS_PER_GPU
-CPU_PER_ACTOR = 5		# depends on your CPU cores
+CPU_PER_ACTOR = 5		# depends on your CPU cores << N_CPU_CORES / N_ACTORS
 # training settings
 N_EPOCHS = 5
 N_TRAIN = 145000
