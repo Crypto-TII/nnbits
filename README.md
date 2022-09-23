@@ -30,6 +30,20 @@ _(This work has been submitted to FSE'22 and is currently under review)_
 
 # Demos 
 
+## Jupyter Notebook
+
+A [demo notebook](demo.ipynb) is included in this repository. Please clone the repository and install the requirements
+```bash
+git clone https://github.com/Crypto-TII/nnbits
+cd nnbits
+pip install -r requirements.txt
+```
+Launch the demo notebook.
+
+<!-- To open the demo in Google Colab (allows to execute Python code directly in the browser and provides one GPU and one TPU for free) please click here
+
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Crypto-TII/nbeats_statistical_test/blob/main/demo.ipynb) -->
+
 ## Command line interface
 
 ### Clone repository and create folders
@@ -122,21 +136,6 @@ plt.ylabel('validation accuracy')
 plt.gcf().savefig('result.png', bbox_inches='tight')
 ```
 ![image](https://user-images.githubusercontent.com/73515327/191898706-0b18f16a-e04d-4711-8222-8fdb0a3e7ff0.png)
-
-
-## Jupyter Notebook
-
-A [demo notebook](demo.ipynb) is included in this repository. Please clone the repository and install the requirements
-```bash
-git clone https://github.com/Crypto-TII/nnbits
-cd nnbits
-pip install -r requirements.txt
-```
-Launch the demo notebook.
-
-<!-- To open the demo in Google Colab (allows to execute Python code directly in the browser and provides one GPU and one TPU for free) please click here
-
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Crypto-TII/nbeats_statistical_test/blob/main/demo.ipynb) -->
 
 # Background information
 
