@@ -19,6 +19,8 @@ _(This work has been submitted to FSE'22 and is currently under review)_
 # Demos 
 
 ## Command line interface
+
+### Clone repository and create folders
 ```bash
 # clone repository
 git clone https://github.com/Crypto-TII/nnbits
@@ -31,8 +33,9 @@ mkdir 'speck_32_64'
 # create working directory for analysis results
 mkdir 'demo_speck32_roundid6'
 ```
-
-Create a configuration file `config.cfg` file in the working directory (e.g. via `vim 'demo_speck32_roundid6/config.cfg'`) with the following content:
+### Create a configuration file
+Create a configuration file `config.cfg` file in the working directory (e.g. via `vim 'demo_speck32_roundid6/config.cfg'`) with the following content. 
+The configuration file contains all details for the ensemble training, such as the path for the data to be analyzed (`DATAPATH`) or the number of `NEURAL_NETWORKS`. 
 ```python
 DATAPATH = "speck_32_64/round6_sequences300k.npy"
 # ensemble settings
@@ -54,7 +57,8 @@ N_TEST = 0
 BATCHSIZE = 5000
 ```
 
-Run in Python 
+### Create the dataset
+(Python)
 ```python 
 #### Create the dataset ######
 number_of_samples = 300_000
@@ -66,13 +70,14 @@ dataset = data_generator.generate_avalanche_dataset(int(number_of_samples))
 
 np.save(f"speck_32_64/round6_sequences300k.npy", dataset[6])
 ```
-
-Run the NNBits ensemble analysis:
+### Run the NNBits analysis
+(bash)
 ```bash
 python -m nnbits.run --savepath 'demo_speck32_roundid6'
 ```
 
-Analyze the outcome (Python):
+### Analyze the outcome 
+(Python)
 ```python 
 from nnbits.filemanager import FileManager
 F = FileManager('demo_speck32_roundid6') 
