@@ -86,30 +86,29 @@ python -m nnbits.run --savepath 'demo_speck32_roundid6'
 ### Analyze the outcome 
 (Python)
 ```python 
+import numpy as np
+
 from nnbits.filemanager import FileManager
+from nnbits.bitanalysis import get_X
+
+# the file manager knows where to find all files in the working directory:
 F = FileManager('demo_speck32_roundid6') 
 
-from nnbits.bitanalysis import get_X
+# get the accuracies for all networks on all single bits:
 X = get_X(F)
 
 # the bit accuracies are calculated by taking the mean over all neural networks which predict the particular bit 
-# (axis=0):
-# (the following three lines catch a runtime warning if a mean-calculation is empty. This happens if not all bits have been analyzed yet.)
-import warnings
-import numpy as np
-with warnings.catch_warnings():
-    warnings.simplefilter("ignore", category=RuntimeWarning)
-    bit_accuracies = np.nanmean(X, axis=0)
-	
+bit_accuracies = np.nanmean(X, axis=0)
+# find the best bit
 best_bit_id = np.nanargmax(bit_accuracies)
-print(best_bit_id, bit_accuracies[best_bit_id])
 	
+#### Create a figure ######
 import matplotlib.pyplot as plt
 
 # here we visualize the obtained `bit_accuracies`:
 plt.figure(figsize=(10, 3), dpi=150)
 plt.plot(bit_accuracies, 'o', markersize=3, linestyle = 'None', label="mean validation accuracy of each bit")
-
+# here we visualize the best bit
 plt.plot(best_bit_id, bit_accuracies[best_bit_id], marker='x', c='C0', linestyle = 'None', label=f"best bit {int(best_bit_id)} with {float(bit_accuracies[best_bit_id])*100:.1f}% accuracy")
 
 plt.legend(loc='upper left')
