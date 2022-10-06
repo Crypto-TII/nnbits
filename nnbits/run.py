@@ -151,7 +151,7 @@ def config_add_optional_defaults(_config):
     If an argument is not provided in config and the argument is optional,
     this function sets the default values.
     """
-    optional_defaults = {'INPUT_DATA_OP': 'None',
+    optional_defaults = {'INPUT_DATA_OP': 'zero',
                          'SELECT_BITS_STRATEGY': 'random',
                          'PREDICT_LABEL': False,
                          'TARGET_BITS': [],
