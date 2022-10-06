@@ -31,10 +31,6 @@ pip install -r requirements.txt
 ```
 In `conda` you can install Jupyter Lab via `conda install -c conda-forge jupyterlab` and launch Jupyter Lab via `jupyter lab`.
 
-<!-- To open the demo in Google Colab (allows to execute Python code directly in the browser and provides one GPU and one TPU for free) please click here
-
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Crypto-TII/nbeats_statistical_test/blob/main/demo.ipynb) -->
-
 ## Command line interface
 
 ### Clone repository and create folders
@@ -70,7 +66,7 @@ python -m nnbits.run --savepath 'demo_speck32_round7'
 ### Analyze the outcome 
 (bash)
 ```bash
-python -m demo_speck32_round7.demo_analysis.py
+python demo_speck32_round7/demo_analysis.py
 ```
 You should find an image like the following one in the `demo_speck32_round7` folder as `result.png`:
 ![image](https://user-images.githubusercontent.com/73515327/191898706-0b18f16a-e04d-4711-8222-8fdb0a3e7ff0.png)
