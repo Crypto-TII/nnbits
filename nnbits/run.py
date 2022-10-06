@@ -152,7 +152,7 @@ def config_add_optional_defaults(_config):
     this function sets the default values.
     """
     optional_defaults = {'INPUT_DATA_OP': 'None',
-                         'SELECT_BITS_STRATEGY': 'None',
+                         'SELECT_BITS_STRATEGY': 'random',
                          'PREDICT_LABEL': False,
                          'TARGET_BITS': [],
                          'N_RANDOM_BITS': 0,
@@ -355,7 +355,8 @@ if __name__ == '__main__':
         # CREATE THE RAY ACTOR POOL
         # --------------------------------
         # Initialize Ray
-        ray.init()
+        #ray.init()
+        ray.init(log_to_driver=False)
         # Initialize a ray version of the network class with the correct number of
         # GPU and CPU resources:
         RayNetwork = ray.remote(num_gpus=config['GPU_PER_ACTOR'], num_cpus=config['CPU_PER_ACTOR'])(RayNetwork)
