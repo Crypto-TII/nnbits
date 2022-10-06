@@ -57,11 +57,13 @@ import numpy as np
 dataset = data_generator.generate_avalanche_dataset(int(number_of_samples))
 np.save(f"speck_32_64/round6_sequences300k.npy", dataset[6])
 ```
+
 ### Run the NNBits analysis
 (bash)
 ```bash
 python -m nnbits.run --savepath 'demo_speck32_round7'
 ```
+The most likely problem to occur is that you need to adapt the GPU and CPU settings in the configuration file `demo_speck32_round7/config.cfg` as explained in [How to set GPU parameters](#how-to-set-gpu-parameters).
 
 ### Analyze the outcome 
 (bash)
@@ -69,7 +71,7 @@ python -m nnbits.run --savepath 'demo_speck32_round7'
 python demo_speck32_round7/demo_analysis.py
 ```
 You should find an image like the following one in the `demo_speck32_round7` folder as `result.png`:
-![image](https://user-images.githubusercontent.com/73515327/191898706-0b18f16a-e04d-4711-8222-8fdb0a3e7ff0.png)
+![image](https://user-images.githubusercontent.com/73515327/194220790-0f2764b7-ef7d-48c3-a928-2926c4d02eee.png)
 
 # Background information
 
@@ -102,17 +104,12 @@ The tabular output gives the following information in real-time during the train
 
 If you execute the code on a new machine or on a new dataset or with a new model, the parameters which are likely to change are the ones relating to how many actors work in parallel on each GPU
 
-```python
-# How many GPUs are available?
-N_GPUS = 4 
-# Each GPU will host a certain number of actors. 
-# Note: This number will depend on the model and data complexity. 
-# We have used N_ACTORS_PER_GPU = 3 for Speck 32 and N_ACTORS_PER_GPU=2 for Speck 128.
-N_ACTORS_PER_GPU = 6 
-# GPU fraction per actor (typically 0.33 for Speck 32 and 0.5 for Speck 128 for GPUs with 40GB memory per GPU):
-NUM_GPUS=0.15
-# CPUs per actor (typically 8 for Speck 32 and 28 for Speck 128 if you have 128 CPU cores available):
-NUM_CPUS=5
+```bash
+# hardware settings <------------ adjust according to your GPU hardware (check with nvidia-smi)
+N_GPUS = 1                       # how many GPUs do you have available?
+N_ACTORS_PER_GPU = 4             # divide the GPU memory by ~3800 MiB for training a generalized Gohr's network on the avalanche dataset of Speck32/64
+GPU_PER_ACTOR = 0.25             # <= 1/N_ACTORS_PER_GPU
+CPU_PER_ACTOR = 5                # depends on your CPU cores << N_CPU_CORES / N_ACTORS
 ```
 
 You can find useful information about GPU usage by running `watch -n 0.5 nvidia-smi` while running the code. 
