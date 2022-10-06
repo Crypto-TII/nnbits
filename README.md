@@ -23,14 +23,14 @@ _(This work has been submitted to FSE'22 and is currently under review)_
 
 ## Jupyter Notebook
 
-A [demo notebook](demo.ipynb) is included in this repository. Please clone the repository and install the requirements
+A [demo notebook](demo.ipynb) is included in this repository. Please clone the repository and install the requirements by running:
 ```bash
 git clone https://github.com/Crypto-TII/nnbits
 cd nnbits
 pip install -r requirements.txt
 ```
 In `conda` you can install Jupyter Lab via `conda install -c conda-forge jupyterlab` and launch Jupyter Lab via `jupyter lab`. 
-The most likely problem to occur is that you need to adapt the GPU and CPU settings in the configuration file `demo_speck32_round7/config.cfg` as explained in [How to set GPU parameters](#how-to-set-gpu-parameters).
+The most likely problem to occur during the demo execution is that you need to adapt the GPU and CPU settings in the configuration file `demo_speck32_round7/config.cfg` as explained in [How to set GPU parameters](#how-to-set-gpu-parameters).
 
 ## Command line interface
 
