@@ -64,7 +64,7 @@ np.save(f"speck_32_64/round6_sequences300k.npy", dataset[6])
 ### Run the NNBits analysis
 (bash)
 ```bash
-python -m nnbits.run --savepath 'demo_speck32_roundid6'
+python -m nnbits.run --savepath 'demo_speck32_round7'
 ```
 
 ### Analyze the outcome 
