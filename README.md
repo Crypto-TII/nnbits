@@ -2,7 +2,7 @@
 
 We introduce a deep learning ensemble (NNBits) as a tool for bit-profiling and evaluation of cryptographic (pseudo) random bit sequences. 
 
-_(This work has been submitted to FSE'22 and is currently under review)_
+_(This work has been submitted and is currently under review)_
 
 - [Demos](#demos)
   * [Jupyter Notebook](#jupyter-notebook)
@@ -20,17 +20,6 @@ _(This work has been submitted to FSE'22 and is currently under review)_
 <small><i><a href='http://ecotrust-canada.github.io/markdown-toc/'>Table of contents generated with markdown-toc</a></i></small>
 
 # Demos 
-
-## Jupyter Notebook
-
-A [demo notebook](demo.ipynb) is included in this repository. Please clone the repository and install the requirements by running:
-```bash
-git clone https://github.com/Crypto-TII/nnbits
-cd nnbits
-pip install -r requirements.txt
-```
-In `conda` you can install Jupyter Lab via `conda install -c conda-forge jupyterlab` and launch Jupyter Lab via `jupyter lab`. 
-The most likely problem to occur during the demo execution is that you need to adapt the GPU and CPU settings in the configuration file `demo_speck32_round7/config.cfg` as explained in [How to set GPU parameters](#how-to-set-gpu-parameters).
 
 ## Command line interface
 
@@ -73,6 +62,17 @@ python demo_speck32_round7/demo_analysis.py
 ```
 You should find an image like the following one in the `demo_speck32_round7` folder as `result.png`:
 ![image](https://user-images.githubusercontent.com/73515327/194220790-0f2764b7-ef7d-48c3-a928-2926c4d02eee.png)
+
+## Jupyter Notebook
+
+A [demo notebook](demo.ipynb) is included in this repository. Please clone the repository and install the requirements by running:
+```bash
+git clone https://github.com/Crypto-TII/nnbits
+cd nnbits
+pip install -r requirements.txt
+```
+In `conda` you can install Jupyter Lab via `conda install -c conda-forge jupyterlab` and launch Jupyter Lab via `jupyter lab`. 
+The most likely problem to occur during the demo execution is that you need to adapt the GPU and CPU settings in the configuration file `demo_speck32_round7/config.cfg` as explained in [How to set GPU parameters](#how-to-set-gpu-parameters).
 
 # Background information
 
