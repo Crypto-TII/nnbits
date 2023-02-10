@@ -65,7 +65,7 @@ You should find an image like the following one in the `demo_speck32_round7` fol
 
 ## Jupyter Notebook
 
-A [demo notebook](demo.ipynb) is included in this repository. Please clone the repository and install the requirements by running:
+Two demo notebooks are included in this repository. Please clone the repository and install the requirements by running:
 ```bash
 git clone https://github.com/Crypto-TII/nnbits
 cd nnbits
