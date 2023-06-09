@@ -2,7 +2,8 @@
 
 We introduce a deep learning ensemble (NNBits) as a tool for bit-profiling and evaluation of cryptographic (pseudo) random bit sequences. 
 
-_(This work has been published in Topics in Cryptology – CT-RSA 2023: Cryptographers’ Track at the RSA Conference 2023, San Francisco, CA, USA, April 24–27, 2023, ProceedingsApr 2023Pages 493–523 https://doi.org/10.1007/978-3-031-30872-7_19)_
+_This work has been published in Topics in Cryptology – CT-RSA 2023: Cryptographers’ Track at the RSA Conference 2023, San Francisco, CA, USA, April 24–27, 2023, ProceedingsApr 2023Pages 493–523 https://doi.org/10.1007/978-3-031-30872-7_19_
+_Please find the ePrint version under https://eprint.iacr.org/2023/819_
 
 - [Demos](#demos)
   * [Jupyter Notebook](#jupyter-notebook)
